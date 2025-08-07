@@ -13,7 +13,7 @@
             android:id="@+id/tv_page_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="나의 훈련"
+            android:text="박진수님"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -67,7 +67,7 @@
                 android:id="@+id/tvDrivingScoreTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="금주 운행 점수"
+                android:text="금주 운행 기록"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 

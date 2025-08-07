@@ -26,7 +26,6 @@ class ScoreAdapter(private val scores: List<ScoreItem>) :
         val item = scores[position]
         holder.tvLabel.text = item.label
         holder.tvValue.text = item.value
-        holder.tvValue.setTextColor(item.color)
     }
 
     override fun getItemCount() = scores.size

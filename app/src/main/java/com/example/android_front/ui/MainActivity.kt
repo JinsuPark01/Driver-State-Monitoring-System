@@ -1,9 +1,11 @@
 package com.example.android_front.ui
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,10 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         // 운행 점수 RecyclerView 초기화
         val scores = listOf(
-            ScoreItem("종합 점수", "85점", Color.BLACK),
-            ScoreItem("과속 감지", "72점", Color.RED),
-            ScoreItem("졸음 감지", "100점", Color.parseColor("#4CAF50")),
-            ScoreItem("운행 거리", "40KM", Color.BLACK)
+            ScoreItem("종합 점수", "85점"),
+            ScoreItem("과속 감지", "72점"),
+            ScoreItem("졸음 감지", "100점"),
+            ScoreItem("운행 거리", "40KM")
         )
 
         val scoreRecyclerView = findViewById<RecyclerView>(R.id.rvDrivingScores)
@@ -54,6 +56,13 @@ class MainActivity : AppCompatActivity() {
                 setCurrentIndicator(position, indicatorLayout)
             }
         })
+
+        // 운행 기록 자세히 보기 버튼
+        val viewMoreText = findViewById<TextView>(R.id.tvViewMore)
+        viewMoreText.setOnClickListener {
+            val intent = Intent(this, AllScoreActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupIndicators(count: Int, layout: LinearLayout) {
