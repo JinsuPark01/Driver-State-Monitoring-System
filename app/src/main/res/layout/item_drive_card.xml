@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_drive_card"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tvDriverName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="운행자 : 홍길동"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvRouteNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="노선 번호 : 00"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/tvDepartureTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="출발 시간 : 00:00"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/tvDriveStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="운행 상태 : 운행 전"
+        android:textSize="14sp"
+        android:textColor="@color/blue"
+        android:layout_marginTop="4dp" />
+</LinearLayout>
