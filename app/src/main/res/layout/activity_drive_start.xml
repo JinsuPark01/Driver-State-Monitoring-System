@@ -1,0 +1,129 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- 제목 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back_arrow" />
+        <TextView
+            android:id="@+id/tv_page_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="박진수님"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <!-- 메인 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- 배차 일지 영역 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="배차 정보 확인"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- 배차 일지 상세 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_drive_card"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvDriverName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="운행자 : 홍길동"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvRouteNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="노선 번호 : 00"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvDepartureTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="출발 시간 : 00:00"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvDriveStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="운행 상태 : 운행 전"
+                android:textSize="14sp"
+                android:textColor="@color/blue"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="운행 정보에 문제가 있나요?"
+            android:textSize="14sp"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/blue"
+            android:gravity="center_horizontal"/>
+
+    </LinearLayout>
+    <!-- 하단 네비게이션 바 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 위쪽 연한 회색 테두리 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#DDDDDD" />
+
+        <!-- 네비게이션 바 본체 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:id="@+id/btnSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="운행 시작하기"
+                android:padding="8dp"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:background="@drawable/bg_button" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

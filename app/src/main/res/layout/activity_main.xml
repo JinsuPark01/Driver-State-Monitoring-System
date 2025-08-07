@@ -93,5 +93,22 @@
             android:overScrollMode="never"
             android:layout_marginTop="8dp" />
     </LinearLayout>
+    <!-- 공지사항, 설정  카드 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <include layout="@layout/item_menu_card"
+            android:id="@+id/menuMyPage" />
+
+        <include layout="@layout/item_menu_card"
+            android:id="@+id/menuNotice" />
+
+        <include layout="@layout/item_menu_card"
+            android:id="@+id/menuSettings" />
+    </LinearLayout>
+
+
 
 </LinearLayout>
