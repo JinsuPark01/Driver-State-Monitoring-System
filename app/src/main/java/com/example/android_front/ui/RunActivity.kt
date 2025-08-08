@@ -10,14 +10,10 @@ import com.example.android_front.adapter.ScoreAdapter
 import com.example.android_front.data.ScoreItem
 import com.example.android_front.decoration.SpaceItemDecoration
 
-class AllScoreActivity : AppCompatActivity() {
+class RunActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_all_score)
-
-        // 👇 btnBack 처리 추가
-        val btnBack = findViewById<View>(R.id.btnBack)
-        btnBack.setOnClickListener { finish() }
+        setContentView(R.layout.activity_drive_run)
 
         val recyclerView = findViewById<RecyclerView>(R.id.rv_score_cards)
 
