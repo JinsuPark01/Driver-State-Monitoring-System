@@ -25,13 +25,18 @@ class MainActivity : AppCompatActivity() {
         val indicatorLayout = findViewById<LinearLayout>(R.id.indicator_layout)
 
         val items = listOf(
-            DispatchItem("박진수", "86", "09:20", "운행 전"),
-            DispatchItem("김철수", "24", "10:10", "운행 중"),
-            DispatchItem("이영희", "12", "11:30", "운행 전"),
-            DispatchItem("이영희", "14", "11:30", "운행 전")
+            DispatchItem(1, "박진수", "86", "09:20", "운행 전"),
+            DispatchItem(2, "박진수", "24", "10:10", "운행 중"),
+            DispatchItem(3, "박진수", "12", "11:30", "운행 전"),
+            DispatchItem(4, "박진수", "14", "14:30", "운행 전")
         )
 
-        viewPager.adapter = DispatchPagerAdapter(items)
+        viewPager.adapter = DispatchPagerAdapter(items) { dispatchId ->
+            val intent = Intent(this, StartActivity::class.java).apply {
+                putExtra("dispatchId", dispatchId)
+            }
+            startActivity(intent)
+        }
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
         // 운행 점수 RecyclerView 초기화

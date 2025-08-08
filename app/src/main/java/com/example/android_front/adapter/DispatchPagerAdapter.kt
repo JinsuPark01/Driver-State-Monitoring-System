@@ -8,14 +8,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
 import com.example.android_front.data.DispatchItem
 
-class DispatchPagerAdapter(private val items: List<DispatchItem>) :
-    RecyclerView.Adapter<DispatchPagerAdapter.ViewHolder>() {
+class DispatchPagerAdapter(
+    private val items: List<DispatchItem>,
+    private val onItemClick: (Long) -> Unit // id만 넘김
+) : RecyclerView.Adapter<DispatchPagerAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvDriverName: TextView = view.findViewById(R.id.tvDriverName)
         val tvRouteNumber: TextView = view.findViewById(R.id.tvRouteNumber)
         val tvDepartureTime: TextView = view.findViewById(R.id.tvDepartureTime)
         val tvDriveStatus: TextView = view.findViewById(R.id.tvDriveStatus)
+
+        init {
+            view.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClick(items[position].id)
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,3 +45,4 @@ class DispatchPagerAdapter(private val items: List<DispatchItem>) :
 
     override fun getItemCount() = items.size
 }
+

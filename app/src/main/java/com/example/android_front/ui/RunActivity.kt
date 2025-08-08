@@ -1,7 +1,9 @@
 package com.example.android_front.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,5 +37,20 @@ class RunActivity : AppCompatActivity() {
         val spacing = resources.getDimensionPixelSize(R.dimen.score_item_spacing)
         recyclerView.addItemDecoration(SpaceItemDecoration(spacing))
         recyclerView.adapter = ScoreAdapter(scoreList)
+
+        // 🚗 운행 종료 버튼 처리
+        val btnEnd = findViewById<TextView>(R.id.btnEnd)
+        btnEnd.setOnClickListener {
+            // 나중에 여기서 DB 저장 로직 추가 예정
+            // 예: saveDriveResultToDb()
+
+            // 메인 화면으로 이동
+            val intent = Intent(this, MainActivity::class.java).apply {
+                // 백스택에 있는 다른 액티비티 모두 제거
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
+            finish()
+        }
     }
 }
