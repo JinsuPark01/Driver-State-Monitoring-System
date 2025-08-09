@@ -110,7 +110,7 @@
                         android:id="@+id/tv_current_speed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="89"
+                        android:text="0"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -140,7 +140,7 @@
                         android:id="@+id/tv_total_distance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="7.8KM"
+                        android:text="0.0KM"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />

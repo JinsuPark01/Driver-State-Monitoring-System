@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 간단한 네트워크 권한만 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,6 +29,11 @@
         <activity android:name=".ui.StartActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.RunActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.AllScoreActivity" android:exported="true" android:screenOrientation="portrait" />
+
+        <service
+            android:name=".service.SocketService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
