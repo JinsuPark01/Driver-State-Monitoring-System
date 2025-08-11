@@ -40,7 +40,7 @@ class DispatchPagerAdapter(
         holder.tvDriverName.text = "운행자 : ${item.driverName}"
         holder.tvRouteNumber.text = "노선 번호 : ${item.routeNumber}"
         holder.tvDepartureTime.text = "출발 시간 : ${item.departureTime}"
-        holder.tvDriveStatus.text = "운행 상태 : ${item.status}"
+        holder.tvDriveStatus.text = "${item.status}"
     }
 
     override fun getItemCount() = items.size
