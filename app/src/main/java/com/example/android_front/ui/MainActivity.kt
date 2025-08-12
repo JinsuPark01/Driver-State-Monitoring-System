@@ -2,6 +2,7 @@ package com.example.android_front.ui
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -50,6 +51,28 @@ class MainActivity : AppCompatActivity() {
         val scoreRecyclerView = findViewById<RecyclerView>(R.id.rvDrivingScores)
         scoreRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         scoreRecyclerView.adapter = ScoreAdapter(scores)
+
+        // 아이템 간격 8dp 적용
+        val spacingInDp = 8
+        val scale = resources.displayMetrics.density
+        val spacingInPx = (spacingInDp * scale + 0.5f).toInt()
+
+        scoreRecyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect, view: View,
+                parent: RecyclerView, state: RecyclerView.State
+            ) {
+                val position = parent.getChildAdapterPosition(view)
+                val itemCount = state.itemCount
+
+                if (position == itemCount - 1) {
+                    // 마지막 아이템 오른쪽 간격 없음
+                    outRect.right = 0
+                } else {
+                    outRect.right = spacingInPx
+                }
+            }
+        })
 
         // 인디케이터 생성
         setupIndicators(items.size, indicatorLayout)

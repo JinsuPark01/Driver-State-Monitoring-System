@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
 import com.example.android_front.adapter.ScoreAdapter
 import com.example.android_front.data.ScoreItem
-import com.example.android_front.decoration.SpaceItemDecoration
 import com.example.android_front.service.SocketService
 
 class RunActivity : AppCompatActivity() {
@@ -68,7 +67,6 @@ class RunActivity : AppCompatActivity() {
         // UI 컴포넌트 초기화
         tvCurrentSpeed = findViewById(R.id.tv_current_speed)
 
-        setupRecyclerView()
         setupEndButton()
     }
 
@@ -94,14 +92,6 @@ class RunActivity : AppCompatActivity() {
         // 서비스는 계속 실행되도록 stopService() 호출하지 않음
     }
 
-    private fun setupRecyclerView() {
-        recyclerView = findViewById(R.id.rv_score_cards)
-        recyclerView.layoutManager = GridLayoutManager(this, 3)
-        val spacing = resources.getDimensionPixelSize(R.dimen.score_item_spacing)
-        recyclerView.addItemDecoration(SpaceItemDecoration(spacing))
-        scoreAdapter = ScoreAdapter(scoreList)
-        recyclerView.adapter = scoreAdapter
-    }
 
     private fun setupEndButton() {
         val btnEnd = findViewById<TextView>(R.id.btnEnd)
