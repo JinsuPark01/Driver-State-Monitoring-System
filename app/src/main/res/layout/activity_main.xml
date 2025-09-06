@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -80,7 +81,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_monitor" />
+                    android:src="@drawable/ic_monitor"
+                    app:tint="#449fd5"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -103,7 +105,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_person" />
+                    android:src="@drawable/ic_person"
+                    app:tint="#498bd0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -126,7 +129,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_speaker" />
+                    android:src="@drawable/ic_speaker"
+                    app:tint="#4f71c8"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -149,7 +153,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_setting" />
+                    android:src="@drawable/ic_setting"
+                    app:tint="#555cc1"/>
 
                 <TextView
                     android:layout_width="wrap_content"

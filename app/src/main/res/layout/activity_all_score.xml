@@ -30,7 +30,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
         android:orientation="vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -42,7 +41,8 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:background="@drawable/bg_drive_card">
+            android:background="@drawable/bg_drive_card"
+            android:elevation="4dp">
 
             <ImageView
                 android:id="@+id/iv_profile"
@@ -108,7 +108,8 @@
             android:orientation="horizontal"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
-            android:weightSum="4">
+            android:weightSum="4"
+            android:elevation="4dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -240,7 +241,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_drive_card"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:elevation="4dp">
 
             <!-- MPAndroidChart 예시 -->
             <com.github.mikephil.charting.charts.BarChart

@@ -8,30 +8,25 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
-import com.example.android_front.adapter.ScoreAdapter
-import com.example.android_front.data.ScoreItem
 import com.example.android_front.service.SocketService
 
 class RunActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var scoreAdapter: ScoreAdapter
-    private lateinit var tvCurrentSpeed: TextView  // 속도 표시용 TextView
-
-    private val scoreList = mutableListOf(
-        ScoreItem("종합 점수", "0점"),
-        ScoreItem("과속 감지", "0회"),
-        ScoreItem("졸음 감지", "0회"),
-        ScoreItem("급가속", "0회"),
-        ScoreItem("급제동", "0회"),
-        ScoreItem("이상 행동", "미감지")
-    )
+    private lateinit var tvCurrentSpeed: TextView  // 속도 표시
+    private lateinit var tvAcceleration: TextView  // 급가속 횟수 표시
+    private lateinit var tvBraking: TextView       // 급제동 횟수 표시
 
     private var socketService: SocketService? = null
     private var isBound = false
+
+    // 속도 기록용 버퍼
+    private val speedBuffer = mutableListOf<Pair<Long, Double>>() // (timestamp, speed)
+    private var lastCheckedTime: Long = 0
+
+    // 카운터
+    private var accelerationCount = 0
+    private var brakingCount = 0
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -43,14 +38,11 @@ class RunActivity : AppCompatActivity() {
             socketService?.setSpeedCallback { speed ->
                 runOnUiThread {
                     val speedText = "${speed.toInt()} km/h"
-
-                    // 1. RecyclerView의 scoreList 첫 번째 아이템 업데이트
-                    scoreList[0] = scoreList[0].copy(value = speedText)
-                    scoreAdapter.notifyItemChanged(0)
-
-                    // 2. tv_current_speed TextView 업데이트
                     tvCurrentSpeed.text = speedText
                 }
+
+                // 급가속/급제동 판별
+                handleSpeedUpdate(speed.toDouble())
             }
         }
 
@@ -64,8 +56,10 @@ class RunActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drive_run)
 
-        // UI 컴포넌트 초기화
+        // UI 초기화
         tvCurrentSpeed = findViewById(R.id.tv_current_speed)
+        tvAcceleration = findViewById(R.id.tv_over_speed)
+        tvBraking = findViewById(R.id.tv_under_speed)
 
         setupEndButton()
     }
@@ -74,39 +68,76 @@ class RunActivity : AppCompatActivity() {
         super.onStart()
         val intent = Intent(this, SocketService::class.java)
 
-        // 1. 먼저 서비스 시작 (onCreate 보장)
+        // 서비스 시작 및 바인딩
         startService(intent)
-
-        // 2. 그 다음 바인딩
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onStop() {
         super.onStop()
         if (isBound) {
-            // 속도 수신 콜백 해제
             socketService?.removeSpeedCallback()
             unbindService(connection)
             isBound = false
         }
-        // 서비스는 계속 실행되도록 stopService() 호출하지 않음
     }
-
 
     private fun setupEndButton() {
         val btnEnd = findViewById<TextView>(R.id.btnEnd)
         btnEnd.setOnClickListener {
             // TODO: DB 저장 로직 추가 예정
-
-            // 속도 수신 중단(콜백 해제) - 액티비티 종료 전에 실행해도 되지만 onStop() 에서도 처리됨
             socketService?.removeSpeedCallback()
 
-            // 메인 화면으로 이동하며 종료
             val intent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(intent)
             finish()
+        }
+    }
+
+    /**
+     * 속도 업데이트 처리 (급가속/급제동 판별)
+     */
+    private fun handleSpeedUpdate(currentSpeed: Double) {
+        val now = System.currentTimeMillis()
+
+        // 현재 값 기록
+        speedBuffer.add(now to currentSpeed)
+
+        // 1초가 지난 데이터는 제거
+        speedBuffer.removeAll { (time, _) -> now - time > 1000 }
+
+        // 최소 1초 단위로만 체크
+        if (now - lastCheckedTime >= 1000) {
+            lastCheckedTime = now
+
+            if (speedBuffer.size >= 2) {
+                val oldest = speedBuffer.first().second
+                val newest = speedBuffer.last().second
+
+                val deltaV = newest - oldest
+                val deltaT = (speedBuffer.last().first - speedBuffer.first().first) / 1000.0
+
+                if (deltaT > 0) {
+                    val rate = deltaV / deltaT // km/h per second
+
+                    when {
+                        rate >= 10.0 -> { // 급가속
+                            accelerationCount++
+                            runOnUiThread {
+                                tvAcceleration.text = "급가속: $accelerationCount 회"
+                            }
+                        }
+                        rate <= -10.0 -> { // 급제동
+                            brakingCount++
+                            runOnUiThread {
+                                tvBraking.text = "급제동: $brakingCount 회"
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

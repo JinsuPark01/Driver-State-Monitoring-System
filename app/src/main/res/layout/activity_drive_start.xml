@@ -47,7 +47,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_drive_card"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="12dp"
+            android:elevation="4dp">
 
             <!-- 운전자 -->
             <LinearLayout
@@ -228,21 +229,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 위쪽 연한 회색 테두리 -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#DDDDDD" />
-
         <!-- 네비게이션 바 본체 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#FFFFFF"
+            android:background="#F5F5F5"
             android:gravity="center_vertical"
             android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingBottom="16dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
@@ -252,8 +247,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="운행 시작하기"
-                android:padding="8dp"
-                android:textColor="#FFFFFF"
+                android:padding="12dp"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 android:background="@drawable/bg_button" />
         </LinearLayout>

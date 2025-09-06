@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@android:color/white">
+    <ImageView
+        android:id="@+id/icDeco"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_deco"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/header_container"
@@ -26,7 +33,7 @@
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="12dp"
-            android:background="#00897B" />
+            android:background="@color/main" />
 
         <!-- 텍스트 묶음 -->
         <LinearLayout
@@ -39,8 +46,8 @@
                 android:id="@+id/tvAppName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="감정록"
-                android:textColor="#00897B"
+                android:text="운전의 진수"
+                android:textColor="@color/main"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
@@ -153,14 +160,13 @@
         android:layout_marginEnd="24dp"
         android:text="회원가입"
         android:textAllCaps="false"
-        android:textColor="#00897B"
+        android:textColor="@color/main"
         app:cornerRadius="24dp"
         app:layout_constraintBottom_toTopOf="@+id/btnLogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-
-        app:strokeColor="#00897B"
+        app:strokeColor="@color/main"
         app:strokeWidth="1dp" />
 
     <com.google.android.material.button.MaterialButton
@@ -169,10 +175,10 @@
         android:layout_height="56dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:text="로그인"
         android:textAllCaps="false"
-        app:backgroundTint="#00897B"
+        app:backgroundTint="#4C7DCC"
         app:cornerRadius="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
