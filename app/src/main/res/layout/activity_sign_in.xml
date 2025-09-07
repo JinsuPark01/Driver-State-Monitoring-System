@@ -56,18 +56,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="오늘의 감정을 기록하다"
+                android:text="AI 활용 차량 관제 시스템"
                 android:textColor="#757575"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/tvDescHan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="감정, 錄"
-                android:textColor="#757575"
-                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -94,7 +86,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="24dp"
         android:background="@drawable/bg_input_field"
-        android:hint="이메일 입력"
+        android:hint="아이디 입력"
         android:inputType="text"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"

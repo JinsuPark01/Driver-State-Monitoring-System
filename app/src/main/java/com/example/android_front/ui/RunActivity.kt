@@ -126,13 +126,13 @@ class RunActivity : AppCompatActivity() {
                         rate >= 10.0 -> { // 급가속
                             accelerationCount++
                             runOnUiThread {
-                                tvAcceleration.text = "급가속: $accelerationCount 회"
+                                tvAcceleration.text = "${accelerationCount}회"
                             }
                         }
                         rate <= -10.0 -> { // 급제동
                             brakingCount++
                             runOnUiThread {
-                                tvBraking.text = "급제동: $brakingCount 회"
+                                tvBraking.text = "${brakingCount}회"
                             }
                         }
                     }

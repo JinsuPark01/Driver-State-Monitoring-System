@@ -26,6 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.LoginActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.StartActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.RunActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.AllScoreActivity" android:exported="true" android:screenOrientation="portrait" />

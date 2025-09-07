@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:gravity="center_vertical">
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -47,8 +48,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_drive_card"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:elevation="4dp">
+            android:padding="12dp">
 
             <!-- 운전자 -->
             <LinearLayout
