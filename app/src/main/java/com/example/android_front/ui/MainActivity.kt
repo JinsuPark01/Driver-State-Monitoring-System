@@ -1,99 +1,101 @@
 package com.example.android_front.ui
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
-import com.example.android_front.adapter.ScoreAdapter
-import com.example.android_front.data.DispatchItem
-import com.example.android_front.data.ScoreItem
+import com.example.android_front.api.RetrofitInstance
+import com.example.android_front.model.DispatchResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewPager: ViewPager2
+    private lateinit var indicatorLayout: LinearLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // SharedPreferences에서 토큰 확인 (자동 로그인)
+        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
+        val token = prefs.getString("token", null)
+        val driverId = prefs.getInt("driverId", 1) // 예시: 로그인 시 driverId 저장해두었다고 가정
+
+        if (token.isNullOrEmpty()) {
+            // 토큰 없으면 로그인 화면으로 이동
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_main)
 
-        val viewPager = findViewById<ViewPager2>(R.id.viewPager)
-        val indicatorLayout = findViewById<LinearLayout>(R.id.indicator_layout)
+        viewPager = findViewById(R.id.viewPager)
+        indicatorLayout = findViewById(R.id.indicator_layout)
 
-        val items = listOf(
-            DispatchItem(1, "박진수", "86", "09:20", "운행 전"),
-            DispatchItem(2, "박진수", "24", "10:10", "운행 중"),
-            DispatchItem(3, "박진수", "12", "11:30", "운행 전"),
-            DispatchItem(4, "박진수", "14", "14:30", "운행 전")
-        )
+        // 배차일지 API 호출
+        fetchDispatchList(driverId)
+    }
 
-        viewPager.adapter = DispatchPagerAdapter(items) { dispatchId ->
-            val intent = Intent(this, StartActivity::class.java).apply {
-                putExtra("dispatchId", dispatchId)
-            }
-            startActivity(intent)
-        }
-        viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-
-        // 운행 점수 RecyclerView 초기화
-        val scores = listOf(
-            ScoreItem("종합 점수", "85점"),
-            ScoreItem("과속 감지", "72점"),
-            ScoreItem("졸음 감지", "100점"),
-            ScoreItem("운행 거리", "40KM")
-        )
-
-        val scoreRecyclerView = findViewById<RecyclerView>(R.id.rvDrivingScores)
-        scoreRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        scoreRecyclerView.adapter = ScoreAdapter(scores)
-
-        // 아이템 간격 8dp 적용
-        val spacingInDp = 8
-        val scale = resources.displayMetrics.density
-        val spacingInPx = (spacingInDp * scale + 0.5f).toInt()
-
-        scoreRecyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
-            override fun getItemOffsets(
-                outRect: Rect, view: View,
-                parent: RecyclerView, state: RecyclerView.State
-            ) {
-                val position = parent.getChildAdapterPosition(view)
-                val itemCount = state.itemCount
-
-                if (position == itemCount - 1) {
-                    // 마지막 아이템 오른쪽 간격 없음
-                    outRect.right = 0
-                } else {
-                    outRect.right = spacingInPx
+    private fun fetchDispatchList(driverId: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.dispatchApi.getDispatchList(driverId)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val dispatchList = response.body() ?: emptyList()
+                        setupViewPager(dispatchList)
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "배차 정보를 불러오지 못했습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "네트워크 오류: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-        })
-
-        // 인디케이터 생성
-        setupIndicators(items.size, indicatorLayout)
-        setCurrentIndicator(0, indicatorLayout)
-
-        // 페이지 변경 시 인디케이터 업데이트
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                setCurrentIndicator(position, indicatorLayout)
-            }
-        })
-
-        // 운행 기록 자세히 보기 버튼
-        val viewMoreText = findViewById<TextView>(R.id.tvViewMore)
-        viewMoreText.setOnClickListener {
-            val intent = Intent(this, AllScoreActivity::class.java)
-            startActivity(intent)
         }
     }
 
-    private fun setupIndicators(count: Int, layout: LinearLayout) {
+    private fun setupViewPager(dispatchList: List<DispatchResponse>) {
+        viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatchId ->
+            // 클릭 시 StartActivity로 이동
+            val intent = Intent(this, StartActivity::class.java)
+            intent.putExtra("dispatchId", dispatchId)
+            startActivity(intent)
+        }
+
+        viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
+        // 인디케이터 설정
+        setupIndicators(dispatchList.size)
+        setCurrentIndicator(0)
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                setCurrentIndicator(position)
+            }
+        })
+    }
+
+    private fun setupIndicators(count: Int) {
+        indicatorLayout.removeAllViews()
         val indicators = Array(count) { View(this) }
         val params = LinearLayout.LayoutParams(16, 16)
         params.setMargins(8, 0, 8, 0)
@@ -102,13 +104,13 @@ class MainActivity : AppCompatActivity() {
                 setBackgroundResource(R.drawable.indicator_unselected)
                 layoutParams = params
             }
-            layout.addView(indicators[i])
+            indicatorLayout.addView(indicators[i])
         }
     }
 
-    private fun setCurrentIndicator(index: Int, layout: LinearLayout) {
-        for (i in 0 until layout.childCount) {
-            val view = layout.getChildAt(i)
+    private fun setCurrentIndicator(index: Int) {
+        for (i in 0 until indicatorLayout.childCount) {
+            val view = indicatorLayout.getChildAt(i)
             if (i == index) {
                 view.setBackgroundResource(R.drawable.indicator_selected)
             } else {

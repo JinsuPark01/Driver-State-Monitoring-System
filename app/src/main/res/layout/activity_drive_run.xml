@@ -11,6 +11,8 @@
         android:orientation="vertical"
         android:padding="16dp">
         <!-- 운전자 카드 -->
+
+        <!-- 점수 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -157,16 +159,15 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 점수 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_drive_card"
+            android:elevation="4dp"
             android:orientation="horizontal"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
-            android:weightSum="4"
-            android:elevation="4dp">
+            android:weightSum="4">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -176,7 +177,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_sleep_avg"
+                    android:id="@+id/tv_sleep"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0회"
@@ -281,6 +282,32 @@
 
         </LinearLayout>
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp">
+
+            <!-- Camera Preview -->
+            <androidx.camera.view.PreviewView
+                android:id="@+id/viewFinder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- 가운데 표시 텍스트 -->
+            <TextView
+                android:id="@+id/tvOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="졸음 운전 감지!"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:layout_gravity="center"
+                android:background="#66000000"
+                android:padding="8dp"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
     </LinearLayout>
 

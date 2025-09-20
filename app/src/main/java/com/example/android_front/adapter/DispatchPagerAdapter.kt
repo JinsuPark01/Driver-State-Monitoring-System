@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
-import com.example.android_front.data.DispatchItem
+import com.example.android_front.model.DispatchResponse
 
 class DispatchPagerAdapter(
-    private val items: List<DispatchItem>,
-    private val onItemClick: (Long) -> Unit // id만 넘김
+    private val items: List<DispatchResponse>,
+    private val onItemClick: (Long) -> Unit // dispatchId 전달
 ) : RecyclerView.Adapter<DispatchPagerAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,7 +23,7 @@ class DispatchPagerAdapter(
             view.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(items[position].id)
+                    onItemClick(items[position].dispatchId) // dispatchId 전달
                 }
             }
         }
@@ -37,12 +37,13 @@ class DispatchPagerAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.tvDriverName.text = "운행자 : ${item.driverName}"
-        holder.tvRouteNumber.text = "노선 번호 : ${item.routeNumber}"
-        holder.tvDepartureTime.text = "출발 시간 : ${item.departureTime}"
-        holder.tvDriveStatus.text = "${item.status}"
+
+        // 운행자 이름이 서버에서 없으면 driverId 사용
+        holder.tvDriverName.text = "운행자 ID : ${item.username}"
+        holder.tvRouteNumber.text = "노선 이름 : ${item.routeNumber}"
+        holder.tvDepartureTime.text = "출발 시간 : ${item.scheduledDeparture}"
+        holder.tvDriveStatus.text = "상태 : ${item.status.displayName}"
     }
 
     override fun getItemCount() = items.size
 }
-

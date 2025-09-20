@@ -185,7 +185,7 @@
                 android:id="@+id/tvDrivingScoreTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="금주 운행 기록"
+                android:text="운행 점수 분석"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
