@@ -61,4 +61,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$cameraxVersion") //Camera2 API 연동
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion") //Lifecycle 기반 바인딩
     implementation("androidx.camera:camera-view:$cameraxVersion") //PreviewView 지원, 화면 출력
+
+    // MediaPipe
+    implementation("com.google.mediapipe:tasks-vision:0.10.14")
 }

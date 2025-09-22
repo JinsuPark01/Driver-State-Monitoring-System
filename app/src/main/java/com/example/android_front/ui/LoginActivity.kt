@@ -80,20 +80,24 @@ class LoginActivity : AppCompatActivity() {
                 )
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        val loginResponse = response.body()
-                        if (loginResponse != null) {
+                        val body = response.body()
+                        if (body != null && body.success && body.data != null) {
+                            val token = body.data.token
                             val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-                            prefs.edit().putString("token", loginResponse.token).apply()
+                            prefs.edit().putString("token", token).apply()
 
                             Toast.makeText(
                                 this@LoginActivity,
-                                "로그인 성공!", //"${loginResponse.username}님, 로그인 성공!",
+                                "로그인 성공!",
                                 Toast.LENGTH_SHORT
                             ).show()
 
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                             startActivity(intent)
                             finish()
+                        } else {
+                            tvPasswordError.visibility = View.VISIBLE
+                            tvPasswordError.text = body?.message ?: "로그인 실패"
                         }
                     } else {
                         tvPasswordError.visibility = View.VISIBLE
@@ -111,4 +115,5 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
 }

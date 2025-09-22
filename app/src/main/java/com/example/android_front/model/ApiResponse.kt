@@ -1,0 +1,7 @@
+package com.example.android_front.model
+
+data class ApiResponse<T>(
+    val success: Boolean,
+    val message: String,
+    val data: T? = null
+)

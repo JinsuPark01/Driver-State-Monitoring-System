@@ -7,10 +7,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
 import com.example.android_front.model.DispatchResponse
+import com.example.android_front.model.DispatchStatus
 
 class DispatchPagerAdapter(
     private val items: List<DispatchResponse>,
-    private val onItemClick: (Long) -> Unit // dispatchId 전달
+    private val onItemClick: (DispatchResponse) -> Unit // dispatchId 전달
 ) : RecyclerView.Adapter<DispatchPagerAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,7 +24,7 @@ class DispatchPagerAdapter(
             view.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(items[position].dispatchId) // dispatchId 전달
+                    onItemClick(items[position]) // dispatchId 전달
                 }
             }
         }
@@ -43,6 +44,14 @@ class DispatchPagerAdapter(
         holder.tvRouteNumber.text = "노선 이름 : ${item.routeNumber}"
         holder.tvDepartureTime.text = "출발 시간 : ${item.scheduledDeparture}"
         holder.tvDriveStatus.text = "상태 : ${item.status.displayName}"
+
+        // 상태별 next_action 글씨
+        holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when(item.status) {
+            DispatchStatus.SCHEDULED -> "운행 시작 →"
+            DispatchStatus.COMPLETED -> "결과 확인 →"
+            DispatchStatus.CANCELLED -> "취소됨"
+            else -> ""
+        }
     }
 
     override fun getItemCount() = items.size

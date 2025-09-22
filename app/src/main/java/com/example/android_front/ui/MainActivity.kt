@@ -11,6 +11,7 @@ import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.api.RetrofitInstance
 import com.example.android_front.model.DispatchResponse
+import com.example.android_front.model.DispatchStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,38 +19,49 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var btnMyPage: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // SharedPreferences에서 토큰 확인 (자동 로그인)
         val prefs = getSharedPreferences("auth", MODE_PRIVATE)
         val token = prefs.getString("token", null)
-        val driverId = prefs.getInt("driverId", 1) // 예시: 로그인 시 driverId 저장해두었다고 가정
 
         if (token.isNullOrEmpty()) {
-            // 토큰 없으면 로그인 화면으로 이동
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
 
         setContentView(R.layout.activity_main)
 
+        btnMyPage = findViewById(R.id.btn_myPage)
         viewPager = findViewById(R.id.viewPager)
         indicatorLayout = findViewById(R.id.indicator_layout)
 
-        // 배차일지 API 호출
-        fetchDispatchList(driverId)
+        btnMyPage.setOnClickListener {
+            startActivity(Intent(this, MyPageActivity::class.java))
+        }
+
+        //fetchDispatchList()만 호출
+        fetchDispatchList()
     }
 
-    private fun fetchDispatchList(driverId: Int) {
+    private fun fetchDispatchList() {
+        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: return
+
+        // 오늘 날짜 (yyyy-MM-dd 형식)
+        val today = java.time.LocalDate.now().toString()
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitInstance.dispatchApi.getDispatchList(driverId)
+                val response = RetrofitInstance.dispatchApi.getDispatchList(
+                    "Bearer $token",
+                    today
+                )
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         val dispatchList = response.body() ?: emptyList()
@@ -74,14 +86,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupViewPager(dispatchList: List<DispatchResponse>) {
-        viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatchId ->
-            // 클릭 시 StartActivity로 이동
-            val intent = Intent(this, StartActivity::class.java)
-            intent.putExtra("dispatchId", dispatchId)
-            startActivity(intent)
-        }
 
+    private fun setupViewPager(dispatchList: List<DispatchResponse>) {
+        viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
+            when (dispatch.status) {
+                DispatchStatus.SCHEDULED -> {
+                    // 예정 → StartActivity 이동
+                    val intent = Intent(this, StartActivity::class.java)
+                    intent.putExtra("dispatchId", dispatch.dispatchId)
+                    startActivity(intent)
+                }
+                DispatchStatus .COMPLETED -> {
+                    // 완료 → RecordActivity 이동
+                    val intent = Intent(this, RecordActivity::class.java)
+                    intent.putExtra("dispatchId", dispatch.dispatchId)
+                    startActivity(intent)
+                }
+                DispatchStatus.CANCELLED -> {
+                    // 취소 → 아무 액션 없음 (필요하면 Toast)
+                    Toast.makeText(this, "취소된 배차입니다.", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // 나머지 상태 (예: RUNNING, DELAYED)
+                    Toast.makeText(this, "현재 상태: ${dispatch.status.displayName}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
         // 인디케이터 설정

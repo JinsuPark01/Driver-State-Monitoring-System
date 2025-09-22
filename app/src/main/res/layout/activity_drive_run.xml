@@ -140,10 +140,10 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tv_total_distance"
+                        android:id="@+id/tv_drivingScore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0.0KM"
+                        android:text="100점"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -152,7 +152,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="총 이동거리"
+                        android:text="운전점수"
                         android:textColor="@color/gray"
                         android:textSize="14sp" />
                 </LinearLayout>
