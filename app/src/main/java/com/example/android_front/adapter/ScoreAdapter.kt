@@ -6,15 +6,23 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
-import com.example.android_front.data.ScoreItem
+import com.example.android_front.model.UserDetailResponse
 
-class ScoreAdapter(private val scores: List<ScoreItem>) :
+class ScoreAdapter(private val userDetail: UserDetailResponse) :
     RecyclerView.Adapter<ScoreAdapter.ScoreViewHolder>() {
 
     inner class ScoreViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvLabel: TextView = view.findViewById(R.id.tvScoreLabel)
         val tvValue: TextView = view.findViewById(R.id.tvScoreValue)
     }
+
+    private val labels = listOf(
+        "종합점수",
+        "졸음운전",
+        "급가속",
+        "급제동",
+        "이상행동"
+    )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScoreViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -23,10 +31,18 @@ class ScoreAdapter(private val scores: List<ScoreItem>) :
     }
 
     override fun onBindViewHolder(holder: ScoreViewHolder, position: Int) {
-        val item = scores[position]
-        holder.tvLabel.text = item.label
-        holder.tvValue.text = item.value
+        holder.tvLabel.text = labels[position]
+        val value = when (position) {
+            0 -> userDetail.avgDrivingScore ?: 100.0
+            1 -> userDetail.avgDrowsinessCount ?: 0.0
+            2 -> userDetail.avgAccelerationCount ?: 0.0
+            3 -> userDetail.avgBrakingCount ?: 0.0
+            4 -> userDetail.avgAbnormalCount ?: 0.0
+            else -> 0.0
+        }
+        holder.tvValue.text = value.toString()
     }
 
-    override fun getItemCount() = scores.size
+    override fun getItemCount() = 5
 }
+

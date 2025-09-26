@@ -24,7 +24,7 @@ class MyPageActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var btnPrevDate: LinearLayout
-    private lateinit var btnSelectDate: LinearLayout
+    private lateinit var btnSelectDate: ImageView
     private lateinit var btnNextDate: LinearLayout
     private lateinit var tvDriverName: TextView
     private lateinit var tvDate: TextView

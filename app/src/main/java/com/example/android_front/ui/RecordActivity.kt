@@ -73,8 +73,8 @@ class RecordActivity : AppCompatActivity() {
                         tvVehicleNumber.text = "차량 번호 : ${detail.vehicleNumber}"
                         tvRouteNumber.text = "노선 : ${detail.routeNumber}"
                         tvDate.text = "날짜 : ${detail.dispatchDate}"
-                        tvDepartureTime.text = "출발 시간 : ${detail.scheduledDepartureTime}"
-                        tvArrivalTime.text = "도착 시간 : ${detail.actualArrivalTime}"
+                        tvDepartureTime.text = "실제 출발 시간 : ${detail.actualDepartureTime?.substringAfter("T") ?: "미기록"}"
+                        tvArrivalTime.text = "실제 도착 시간 : ${detail.actualArrivalTime?.substringAfter("T") ?: "미기록"}"
                         tvDriveStatus.text = detail.status.displayName
 
                         tvSleepAvg.text = "${detail.drowsinessCount}회"

@@ -11,8 +11,13 @@ import com.example.android_front.model.DispatchStatus
 
 class DispatchPagerAdapter(
     private val items: List<DispatchResponse>,
-    private val onItemClick: (DispatchResponse) -> Unit // dispatchId 전달
-) : RecyclerView.Adapter<DispatchPagerAdapter.ViewHolder>() {
+    private val onItemClick: (DispatchResponse) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+        private const val VIEW_TYPE_ITEM = 0
+        private const val VIEW_TYPE_EMPTY = 1
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvDriverName: TextView = view.findViewById(R.id.tvDriverName)
@@ -24,35 +29,54 @@ class DispatchPagerAdapter(
             view.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(items[position]) // dispatchId 전달
+                    onItemClick(items[position])
                 }
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_drive_card, parent, false)
-        return ViewHolder(view)
+    inner class EmptyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvNoDispatch: TextView = view.findViewById(R.id.tvNoDispatch)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
+    override fun getItemViewType(position: Int): Int {
+        return if (items.isEmpty()) VIEW_TYPE_EMPTY else VIEW_TYPE_ITEM
+    }
 
-        // 운행자 이름이 서버에서 없으면 driverId 사용
-        holder.tvDriverName.text = "운행자 : ${item.driverName}"
-        holder.tvRouteNumber.text = "노선 : ${item.routeNumber}"
-        holder.tvDepartureTime.text = "출발 예정 시간 : ${item.scheduledDepartureTime.substringAfter("T")}"
-        holder.tvDriveStatus.text = "상태 : ${item.status.displayName}"
-
-        // 상태별 next_action 글씨
-        holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when(item.status) {
-            DispatchStatus.SCHEDULED -> "운행 시작 →"
-            DispatchStatus.COMPLETED -> "결과 확인 →"
-            DispatchStatus.CANCELLED -> "취소됨"
-            else -> "운행중"
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_EMPTY) {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_drive_no_card, parent, false)
+            EmptyViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_drive_card, parent, false)
+            ViewHolder(view)
         }
     }
 
-    override fun getItemCount() = items.size
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is ViewHolder) {
+            val item = items[position]
+
+            holder.tvDriverName.text = "운행자 : ${item.driverName ?: "알 수 없음"}"
+            holder.tvRouteNumber.text = "노선 : ${item.routeNumber ?: "-"}"
+            holder.tvDepartureTime.text = "출발 예정 시간 : ${item.scheduledDepartureTime.substringAfter("T")}"
+            holder.tvDriveStatus.text = "상태 : ${item.status.displayName ?: "-"}"
+
+            // next_action 업데이트
+            holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when (item.status) {
+                DispatchStatus.SCHEDULED -> "운행 시작 →"
+                DispatchStatus.COMPLETED -> "결과 확인 →"
+                DispatchStatus.CANCELLED -> "취소됨"
+                else -> "운행중"
+            }
+        } else if (holder is EmptyViewHolder) {
+            holder.tvNoDispatch.text = "배차 일정이 없습니다"
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return if (items.isEmpty()) 1 else items.size
+    }
 }

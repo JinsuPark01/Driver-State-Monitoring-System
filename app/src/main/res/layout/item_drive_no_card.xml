@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_drive_card"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/tvNoDispatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="배차 일정이 없습니다"
+            android:textSize="20sp"
+            android:textColor="#888888"
+            android:gravity="center"/>
+    </LinearLayout>
+
+</LinearLayout>
+

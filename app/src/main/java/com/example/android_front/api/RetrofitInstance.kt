@@ -29,6 +29,15 @@ object RetrofitInstance {
             .create(AuthApi::class.java)
     }
 
+    val userApi: UserApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client) // 토큰 자동 추가
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(UserApi::class.java)
+    }
+
     val dispatchApi: DispatchApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
