@@ -1,21 +1,22 @@
 package com.example.android_front.model
 
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class DispatchDetailResponse(
     val dispatchId: Long,
-    val username: String,
-    val busNumber: String,
+    val driverName: String,
+    val vehicleNumber: String,
     val routeNumber: String,
     val status: DispatchStatus,
     val dispatchDate: String,
-    val scheduledDeparture: LocalTime,
-    val scheduledArrival: LocalTime,
-    val actualDeparture: LocalTime,
-    val actualArrival: LocalTime,
-    val drowsinessCount: Int,
-    val accelerationCount: Int,
-    val brakingCount: Int,
-    val abnormalCount: Int,
-    val drivingScore: Int
+    val scheduledDepartureTime: String,
+    val scheduledArrivalTime: String,
+    val actualDepartureTime: String?,
+    val actualArrivalTime: String?,
+    val drowsinessCount: Int?,
+    val accelerationCount: Int?,
+    val brakingCount: Int?,
+    val abnormalCount: Int?,
+    val drivingScore: Int?
 )

@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.google.android.material:material:1.9.0")
+    //implementation("com.google.android.material:material:1.9.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -62,6 +62,23 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion") //Lifecycle 기반 바인딩
     implementation("androidx.camera:camera-view:$cameraxVersion") //PreviewView 지원, 화면 출력
 
-    // MediaPipe
-    implementation("com.google.mediapipe:tasks-vision:0.10.14")
+    // TensorFlow Lite
+    implementation("org.tensorflow:tensorflow-lite:2.13.0")
+    // 필요하면 GPU/NNAPI/Support 라이브러리도 추가 가능
+    // GPU delegate
+    // implementation 'org.tensorflow:tensorflow-lite-gpu:2.13.0'
+    // Support library (모델 입출력 편하게 처리)
+    // implementation 'org.tensorflow:tensorflow-lite-support:0.4.3'
+
+    // STOMP (WebSocket)
+    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+    // OkHttp 필요 (STOMP 내부에서 사용)
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+    // RxJava2 / RxAndroid2 (StompProtocolAndroid uses RxJava2 APIs)
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+
+    //Gson (JSON 직렬화)
+    implementation("com.google.code.gson:gson:2.10.1")
 }

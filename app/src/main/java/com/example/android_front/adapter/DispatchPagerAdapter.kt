@@ -40,9 +40,9 @@ class DispatchPagerAdapter(
         val item = items[position]
 
         // 운행자 이름이 서버에서 없으면 driverId 사용
-        holder.tvDriverName.text = "운행자 ID : ${item.username}"
-        holder.tvRouteNumber.text = "노선 이름 : ${item.routeNumber}"
-        holder.tvDepartureTime.text = "출발 시간 : ${item.scheduledDeparture}"
+        holder.tvDriverName.text = "운행자 : ${item.driverName}"
+        holder.tvRouteNumber.text = "노선 : ${item.routeNumber}"
+        holder.tvDepartureTime.text = "출발 예정 시간 : ${item.scheduledDepartureTime.substringAfter("T")}"
         holder.tvDriveStatus.text = "상태 : ${item.status.displayName}"
 
         // 상태별 next_action 글씨
@@ -50,7 +50,7 @@ class DispatchPagerAdapter(
             DispatchStatus.SCHEDULED -> "운행 시작 →"
             DispatchStatus.COMPLETED -> "결과 확인 →"
             DispatchStatus.CANCELLED -> "취소됨"
-            else -> ""
+            else -> "운행중"
         }
     }
 

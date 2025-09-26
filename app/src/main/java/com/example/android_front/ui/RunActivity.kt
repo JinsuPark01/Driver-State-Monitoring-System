@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,12 +23,12 @@ import androidx.lifecycle.lifecycleScope
 import com.example.android_front.R
 import com.example.android_front.ai.ModelHandler
 import com.example.android_front.api.RetrofitInstance
-import com.example.android_front.model.DispatchFinishRequest
-import com.example.android_front.model.WarningRequest
+import com.example.android_front.api.TokenManager
 import com.example.android_front.model.WarningType
 import com.example.android_front.service.SocketService
-import kotlinx.coroutines.launch
+import com.example.android_front.websocket.WebSocketManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.util.concurrent.ExecutorService
@@ -40,7 +41,6 @@ class RunActivity : AppCompatActivity() {
     private lateinit var tvBraking: TextView
     private lateinit var tvDrowsiness: TextView
     private lateinit var tvAbnormal: TextView
-    //private lateinit var tvDrivingScore: TextView
 
     private var socketService: SocketService? = null
     private var isBound = false
@@ -52,7 +52,6 @@ class RunActivity : AppCompatActivity() {
     private var brakingCount = 0
     private var drowsinessCount = 0
     private var abnormalCount = 0
-    private var drivingScore = 100
 
     private lateinit var previewView: PreviewView
     private lateinit var cameraExecutor: ExecutorService
@@ -105,14 +104,42 @@ class RunActivity : AppCompatActivity() {
         tvBraking = findViewById(R.id.tv_under_speed)
         tvDrowsiness = findViewById(R.id.tv_sleep)
         tvAbnormal = findViewById(R.id.tv_abnormal)
-        //tvDrivingScore = findViewById(R.id.tv_driving_score)
 
         previewView = findViewById(R.id.viewFinder)
         cameraExecutor = Executors.newSingleThreadExecutor()
         modelHandler = ModelHandler(this) // 모델 초기화
 
-        checkCameraPermission()
+        //checkCameraPermission()
         setupEndButton()
+
+        // 🚀 WebSocket 연결
+        WebSocketManager.connect(
+            token = TokenManager.token ?: "",
+            onConnected = { Log.d("WebSocket", "Connected with JWT") },
+            onError = { error -> Log.e("WebSocket", "STOMP connection failed: ${error.message}") }
+        )
+
+        //임시 이벤트 발생 버튼
+        tvAbnormal.setOnClickListener {
+            onAbnormalBehaviorDetected()
+            Toast.makeText(this, "테스트: 이상행동 이벤트 발생", Toast.LENGTH_SHORT).show()
+        }
+        tvDrowsiness.setOnClickListener {
+            onDrowsinessDetected()
+            Toast.makeText(this, "테스트: 졸음감지 이벤트 발생", Toast.LENGTH_SHORT).show()
+        }
+        tvAcceleration.setOnClickListener {
+            accelerationCount++
+            tvAcceleration.text = "${accelerationCount}회"
+            sendWarning(WarningType.ACCELERATION)
+            Toast.makeText(this, "테스트: 급가속 이벤트 발생", Toast.LENGTH_SHORT).show()
+        }
+        tvBraking.setOnClickListener {
+            brakingCount++
+            tvBraking.text = "${brakingCount}회"
+            sendWarning(WarningType.BRAKING)
+            Toast.makeText(this, "테스트: 급제동 이벤트 발생", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStart() {
@@ -131,15 +158,15 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            startCamera()
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
+//    private fun checkCameraPermission() {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//            == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            startCamera()
+//        } else {
+//            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+//        }
+//    }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -184,20 +211,16 @@ class RunActivity : AppCompatActivity() {
         val btnEnd = findViewById<TextView>(R.id.btnEnd)
         btnEnd.setOnClickListener {
             socketService?.removeSpeedCallback()
-            calculateScore()
             sendDrivingFinish()
         }
     }
 
+    /** 경고 이벤트 WebSocket 전송 */
     private fun sendWarning(type: WarningType) {
-        val warningTime = LocalTime.now()
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val request = WarningRequest(dispatchId, type, warningTime)
-                RetrofitInstance.warningApi.createWarning(request)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        val warningTime = LocalTime.now().toString()
+        WebSocketManager.sendDriveEvent(dispatchId, type.name, warningTime)
+        runOnUiThread {
+            Toast.makeText(this, "${type.name} 이벤트 전송됨", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -233,12 +256,6 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
-    private fun calculateScore() {
-        drivingScore = 100 - ((accelerationCount + brakingCount + drowsinessCount + abnormalCount) * 5)
-        drivingScore = drivingScore.coerceAtLeast(0)
-        //tvDrivingScore.text = "운행 점수: $drivingScore 점"
-    }
-
     private fun onDrowsinessDetected() {
         drowsinessCount++
         tvDrowsiness.text = "${drowsinessCount}회"
@@ -251,27 +268,17 @@ class RunActivity : AppCompatActivity() {
         sendWarning(WarningType.ABNORMAL)
     }
 
+    /** 운행 종료는 HTTP 그대로 */
     private fun sendDrivingFinish() {
-        val actualArrival = LocalTime.now()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.dispatchApi.updateDispatchFinish(
-                    dispatchId,
-                    DispatchFinishRequest(
-                        actualArrival,
-                        drowsinessCount,
-                        accelerationCount,
-                        brakingCount,
-                        abnormalCount,
-                        drivingScore,
-                    )
-                )
+                val response = RetrofitInstance.dispatchApi.updateDispatchFinish(dispatchId)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@RunActivity, "운행 기록 저장 완료", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RunActivity, "운행 종료 처리 완료", Toast.LENGTH_SHORT).show()
                         finish()
                     } else {
-                        Toast.makeText(this@RunActivity, "운행 기록 저장 실패", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RunActivity, "운행 종료 실패", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
@@ -285,5 +292,6 @@ class RunActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+        WebSocketManager.disconnect()
     }
 }

@@ -8,13 +8,14 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.android_front.R
+import com.example.android_front.api.RetrofitInstance
+import com.example.android_front.api.TokenManager
+import com.example.android_front.model.LoginRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.example.android_front.api.RetrofitInstance
-import com.example.android_front.model.LoginRequest
+import com.example.android_front.R
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var etUsername: EditText
@@ -31,9 +32,8 @@ class LoginActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("auth", MODE_PRIVATE)
         val token = prefs.getString("token", null)
         if (!token.isNullOrEmpty()) {
-            // 토큰이 있으면 바로 메인으로 이동
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            TokenManager.token = token // 인터셉터용
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
         }
@@ -67,8 +67,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnSignup.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
     }
 
@@ -83,17 +82,14 @@ class LoginActivity : AppCompatActivity() {
                         val body = response.body()
                         if (body != null && body.success && body.data != null) {
                             val token = body.data.token
-                            val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-                            prefs.edit().putString("token", token).apply()
+                            TokenManager.token = token // 인터셉터용
+                            getSharedPreferences("auth", MODE_PRIVATE)
+                                .edit()
+                                .putString("token", token)
+                                .apply()
 
-                            Toast.makeText(
-                                this@LoginActivity,
-                                "로그인 성공!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                            startActivity(intent)
+                            Toast.makeText(this@LoginActivity, "로그인 성공!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                             finish()
                         } else {
                             tvPasswordError.visibility = View.VISIBLE
@@ -106,14 +102,9 @@ class LoginActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "네트워크 오류: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@LoginActivity, "네트워크 오류: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-
 }

@@ -1,16 +1,17 @@
 package com.example.android_front.ui
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android_front.R
-import com.example.android_front.model.RegisterRequest
 import com.example.android_front.api.RetrofitInstance
+import com.example.android_front.model.RegisterRequest
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,13 +23,10 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var etPasswordConfirm: EditText
     private lateinit var etName: EditText
+    private lateinit var etPhoneNumber: EditText
+    private lateinit var etLicenseNumber: EditText
+    private lateinit var etCareerYears: EditText
     private lateinit var etOperate: EditText
-
-    private lateinit var tvEmailError: TextView
-    private lateinit var tvPasswordError: TextView
-    private lateinit var tvPasswordConfirmError: TextView
-    private lateinit var tvNameError: TextView
-    private lateinit var tvOperateError: TextView
 
     private lateinit var btnSignup: MaterialButton
 
@@ -41,32 +39,29 @@ class SignUpActivity : AppCompatActivity() {
         etPassword = findViewById(R.id.etPassword)
         etPasswordConfirm = findViewById(R.id.etPasswordConfirm)
         etName = findViewById(R.id.etName)
+        etPhoneNumber = findViewById(R.id.etPhoneNumber)
+        etLicenseNumber = findViewById(R.id.etLicenseNumber)
+        etCareerYears = findViewById(R.id.etCareerYears)
         etOperate = findViewById(R.id.etOperate)
-
-        tvEmailError = findViewById(R.id.tvEmailError)
-        tvPasswordError = findViewById(R.id.tvPasswordError)
-        tvPasswordConfirmError = findViewById(R.id.tvPasswordConfirmError)
-        tvNameError = findViewById(R.id.tvNameError)
-        tvOperateError = findViewById(R.id.tvOperateError)
 
         btnSignup = findViewById(R.id.btnSignup)
 
-        // 뒤로가기 버튼 처리
+        // 뒤로가기 버튼
         findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
 
-        // 회원가입 버튼 처리
+        // 회원가입 버튼
         btnSignup.setOnClickListener {
             if (validateInputs()) {
                 val request = RegisterRequest(
-                    email= etEmail.text.toString().trim(),
+                    email = etEmail.text.toString().trim(),
                     password = etPassword.text.toString().trim(),
                     username = etName.text.toString().trim(),
                     operatorCode = etOperate.text.toString().trim(),
-                    phoneNumber = "",
-                    licenseNumber = "",
-                    careerYears = 0,
-                    imagePath = "",
-                    role = "driver" // 자동으로 driver 지정
+                    phoneNumber = etPhoneNumber.text.toString().trim(),
+                    licenseNumber = etLicenseNumber.text.toString().trim(),
+                    careerYears = etCareerYears.text.toString().trim().toIntOrNull() ?: 0,
+                    imagePath = "1", // 기본값
+                    role = "DRIVER"
                 )
                 registerUser(request)
             }
@@ -74,52 +69,66 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun validateInputs(): Boolean {
-        var isValid = true
-
-        // 에러 초기화
-        tvEmailError.visibility = View.GONE
-        tvPasswordError.visibility = View.GONE
-        tvPasswordConfirmError.visibility = View.GONE
-        tvNameError.visibility = View.GONE
-        tvOperateError.visibility = View.GONE
-
-        val driverId = etEmail.text.toString().trim()
+        val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
         val passwordConfirm = etPasswordConfirm.text.toString().trim()
         val name = etName.text.toString().trim()
         val operatorId = etOperate.text.toString().trim()
+        val phoneNumber = etPhoneNumber.text.toString().trim()
+        val licenseNumber = etLicenseNumber.text.toString().trim()
+        val career = etCareerYears.text.toString().trim()
 
-        if (driverId.isEmpty()) {
-            tvEmailError.text = "아이디를 입력해주세요"
-            tvEmailError.visibility = View.VISIBLE
-            isValid = false
+        // 모든 필드 기본 tint 초기화
+        val fields = listOf(etEmail, etPassword, etPasswordConfirm, etName, etOperate, etPhoneNumber, etLicenseNumber, etCareerYears)
+        fields.forEach { it.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#BDBDBD")) }
+
+        when {
+            email.isEmpty() -> {
+                etEmail.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("아이디를 입력해주세요")
+                return false
+            }
+            password.length < 6 -> {
+                etPassword.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("비밀번호는 6자리 이상이어야 합니다")
+                return false
+            }
+            password != passwordConfirm -> {
+                etPasswordConfirm.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("비밀번호가 일치하지 않습니다")
+                return false
+            }
+            name.isEmpty() -> {
+                etName.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("이름을 입력해주세요")
+                return false
+            }
+            operatorId.isEmpty() -> {
+                etOperate.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("회사 코드를 입력해주세요")
+                return false
+            }
+            phoneNumber.isEmpty() -> {
+                etPhoneNumber.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("전화번호를 입력해주세요")
+                return false
+            }
+            licenseNumber.isEmpty() -> {
+                etLicenseNumber.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("면허번호를 입력해주세요")
+                return false
+            }
+            career.isEmpty() -> {
+                etCareerYears.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("경력을 입력해주세요")
+                return false
+            }
+            else -> return true
         }
+    }
 
-        if (password.length < 6) {
-            tvPasswordError.text = "비밀번호는 6자리 이상이어야 합니다"
-            tvPasswordError.visibility = View.VISIBLE
-            isValid = false
-        }
-
-        if (password != passwordConfirm) {
-            tvPasswordConfirmError.text = "비밀번호가 일치하지 않습니다"
-            tvPasswordConfirmError.visibility = View.VISIBLE
-            isValid = false
-        }
-
-        if (name.isEmpty()) {
-            tvNameError.text = "이름을 입력해주세요"
-            tvNameError.visibility = View.VISIBLE
-            isValid = false
-        }
-
-        if (operatorId.isEmpty()) {
-            tvOperateError.text = "회사 코드를 입력해주세요"
-            tvOperateError.visibility = View.VISIBLE
-            isValid = false
-        }
-
-        return isValid
+    private fun showSnackbar(message: String) {
+        Snackbar.make(findViewById(R.id.btnSignup), message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun registerUser(request: RegisterRequest) {
@@ -128,16 +137,16 @@ class SignUpActivity : AppCompatActivity() {
                 val response = RetrofitInstance.authApi.register(request)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@SignUpActivity, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                        showSnackbar("회원가입 성공!")
                         startActivity(Intent(this@SignUpActivity, LoginActivity::class.java))
                         finish()
                     } else {
-                        Toast.makeText(this@SignUpActivity, "회원가입 실패: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        showSnackbar("회원가입 실패: ${response.code()}")
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@SignUpActivity, "오류: ${e.message}", Toast.LENGTH_SHORT).show()
+                    showSnackbar("오류: ${e.message}")
                 }
             }
         }

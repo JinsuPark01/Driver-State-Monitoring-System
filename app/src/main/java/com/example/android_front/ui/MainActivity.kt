@@ -26,15 +26,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        val token = prefs.getString("token", null)
-
-        if (token.isNullOrEmpty()) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_main)
 
         btnMyPage = findViewById(R.id.btn_myPage)
@@ -45,27 +36,28 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, MyPageActivity::class.java))
         }
 
-        //fetchDispatchList()만 호출
         fetchDispatchList()
     }
 
     private fun fetchDispatchList() {
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        val token = prefs.getString("token", null) ?: return
-
-        // 오늘 날짜 (yyyy-MM-dd 형식)
-        val today = java.time.LocalDate.now().toString()
-
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitInstance.dispatchApi.getDispatchList(
-                    "Bearer $token",
-                    today
+                    startDate = java.time.LocalDate.now().toString(),
+                    endDate = java.time.LocalDate.now().toString()
                 )
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        val dispatchList = response.body() ?: emptyList()
-                        setupViewPager(dispatchList)
+                        val body = response.body()
+                        if (body != null && body.success && body.data != null) {
+                            setupViewPager(body.data)
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity,
+                                body?.message ?: "배차 정보를 불러오지 못했습니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     } else {
                         Toast.makeText(
                             this@MainActivity,
@@ -86,35 +78,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setupViewPager(dispatchList: List<DispatchResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
                 DispatchStatus.SCHEDULED -> {
-                    // 예정 → StartActivity 이동
                     val intent = Intent(this, StartActivity::class.java)
                     intent.putExtra("dispatchId", dispatch.dispatchId)
                     startActivity(intent)
                 }
-                DispatchStatus .COMPLETED -> {
-                    // 완료 → RecordActivity 이동
+                DispatchStatus.COMPLETED -> {
                     val intent = Intent(this, RecordActivity::class.java)
                     intent.putExtra("dispatchId", dispatch.dispatchId)
                     startActivity(intent)
                 }
                 DispatchStatus.CANCELLED -> {
-                    // 취소 → 아무 액션 없음 (필요하면 Toast)
                     Toast.makeText(this, "취소된 배차입니다.", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    // 나머지 상태 (예: RUNNING, DELAYED)
-                    Toast.makeText(this, "현재 상태: ${dispatch.status.displayName}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "현재 상태: ${dispatch.status.displayName}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
-        // 인디케이터 설정
         setupIndicators(dispatchList.size)
         setCurrentIndicator(0)
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -141,11 +131,10 @@ class MainActivity : AppCompatActivity() {
     private fun setCurrentIndicator(index: Int) {
         for (i in 0 until indicatorLayout.childCount) {
             val view = indicatorLayout.getChildAt(i)
-            if (i == index) {
-                view.setBackgroundResource(R.drawable.indicator_selected)
-            } else {
-                view.setBackgroundResource(R.drawable.indicator_unselected)
-            }
+            view.setBackgroundResource(
+                if (i == index) R.drawable.indicator_selected
+                else R.drawable.indicator_unselected
+            )
         }
     }
 }

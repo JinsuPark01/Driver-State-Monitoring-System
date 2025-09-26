@@ -1,12 +1,10 @@
 package com.example.android_front.ui
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.example.android_front.R
@@ -18,6 +16,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class MyPageActivity : AppCompatActivity() {
 
@@ -30,20 +31,11 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
 
+    private var currentDate: LocalDate = LocalDate.now().minusDays(1) // 기본: 어제
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // 로그인 토큰 체크 (자동 로그인 유지)
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        val token = prefs.getString("token", null)
-        val driverId = prefs.getInt("driverId", 1)
-
-        if (token.isNullOrEmpty()) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_my)
 
         // View 연결
@@ -56,25 +48,66 @@ class MyPageActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.viewPager)
         indicatorLayout = findViewById(R.id.indicator_layout)
 
-        // 뒤로가기 버튼
+        // 뒤로가기
         btnBack.setOnClickListener { finish() }
 
-        // 날짜 클릭 (TODO: DatePicker 연결 가능)
-        btnSelectDate.setOnClickListener {
-            Toast.makeText(this, "날짜 선택하기", Toast.LENGTH_SHORT).show()
+        // 날짜 버튼
+        btnPrevDate.setOnClickListener {
+            currentDate = currentDate.minusDays(1)
+            fetchDispatchList(currentDate)
         }
 
-        // API로 배차 데이터 불러오기
-        fetchDispatchList(driverId)
+        btnNextDate.setOnClickListener {
+            if (currentDate.isBefore(LocalDate.now())) {
+                currentDate = currentDate.plusDays(1)
+                fetchDispatchList(currentDate)
+            } else {
+                Toast.makeText(this, "내일 이후 날짜는 조회할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 날짜 선택
+        btnSelectDate.setOnClickListener {
+            showDatePicker()
+        }
+
+        // 초기 데이터 로딩 (어제 날짜)
+        fetchDispatchList(currentDate)
     }
 
-    private fun fetchDispatchList(driverId: Int) {
+    private fun showDatePicker() {
+        val today = LocalDate.now()
+        val datePicker = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                val selected = LocalDate.of(year, month + 1, dayOfMonth)
+                if (selected.isAfter(today)) {
+                    Toast.makeText(this, "내일 이후 날짜는 선택할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    currentDate = selected
+                    fetchDispatchList(currentDate)
+                }
+            },
+            currentDate.year,
+            currentDate.monthValue - 1,
+            currentDate.dayOfMonth
+        )
+        datePicker.show()
+    }
+
+    private fun fetchDispatchList(date: LocalDate) {
+        tvDate.text = date.format(dateFormatter)
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitInstance.dispatchApi.getDispatchList(driverId)
+                val response = RetrofitInstance.dispatchApi.getDispatchList(
+                    startDate = date.format(dateFormatter),
+                    endDate = date.format(dateFormatter)
+                )
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        val dispatchList = response.body() ?: emptyList()
+                        val apiBody = response.body()
+                        val dispatchList: List<DispatchResponse> = apiBody?.data ?: emptyList()
                         setupViewPager(dispatchList)
                     } else {
                         Toast.makeText(
@@ -100,14 +133,18 @@ class MyPageActivity : AppCompatActivity() {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
                 DispatchStatus.SCHEDULED -> {
-                    val intent = Intent(this, StartActivity::class.java)
-                    intent.putExtra("dispatchId", dispatch.dispatchId)
-                    startActivity(intent)
+                    startActivity(
+                        Intent(this, StartActivity::class.java).apply {
+                            putExtra("dispatchId", dispatch.dispatchId)
+                        }
+                    )
                 }
                 DispatchStatus.COMPLETED -> {
-                    val intent = Intent(this, RecordActivity::class.java)
-                    intent.putExtra("dispatchId", dispatch.dispatchId)
-                    startActivity(intent)
+                    startActivity(
+                        Intent(this, RecordActivity::class.java).apply {
+                            putExtra("dispatchId", dispatch.dispatchId)
+                        }
+                    )
                 }
                 DispatchStatus.CANCELLED -> {
                     Toast.makeText(this, "취소된 배차입니다.", Toast.LENGTH_SHORT).show()
@@ -134,7 +171,6 @@ class MyPageActivity : AppCompatActivity() {
         val indicators = Array(count) { View(this) }
         val params = LinearLayout.LayoutParams(16, 16)
         params.setMargins(8, 0, 8, 0)
-
         for (i in indicators.indices) {
             indicators[i] = View(this).apply {
                 setBackgroundResource(R.drawable.indicator_unselected)

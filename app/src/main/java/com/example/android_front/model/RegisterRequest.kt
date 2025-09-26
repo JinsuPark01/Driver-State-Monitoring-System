@@ -9,5 +9,5 @@ data class RegisterRequest(
     val careerYears: Int,
     val operatorCode: String,
     val imagePath: String,
-    val role: String = "driver"   // 무조건 driver 고정
+    val role: String = "DRIVER"   // 무조건 driver 고정
 )

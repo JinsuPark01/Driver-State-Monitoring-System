@@ -1,38 +1,36 @@
 package com.example.android_front.api
 
+import com.example.android_front.model.ApiResponse
 import com.example.android_front.model.DispatchDetailResponse
-import com.example.android_front.model.DispatchResponse
 import com.example.android_front.model.DispatchFinishRequest
-import com.example.android_front.model.DispatchStartRequest
+import com.example.android_front.model.DispatchResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface DispatchApi {
 
-    @GET("/api/dispatches/me")
+    @GET("/api/driver/me/dispatches")
     suspend fun getDispatchList(
-        @Header("Authorization") token: String,
-        @Query("dispatchDate") dispatchDate: String
-    ): Response<List<DispatchResponse>>
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String
+    ): Response<ApiResponse<List<DispatchResponse>>>
 
-    @GET("/api/dispatch/{dispatchId}")
+    @GET("/api/driver/me/dispatches/{dispatchId}")
     suspend fun getDispatchDetail(
         @Path("dispatchId") dispatchId: Long
-    ): Response<DispatchDetailResponse>
+    ): Response<ApiResponse<DispatchDetailResponse>>
 
-    @PATCH("/api/dispatch/{dispatchId}/start")
+    @PATCH("/api/driver/me/dispatches/{dispatchId}/start")
     suspend fun updateDispatchStart(
-        @Path("dispatchId") dispatchId: Long,
-        @Body record: DispatchStartRequest
-    ): Response<Unit>
-    @PATCH("/api/dispatch/{dispatchId}/finish")
+        @Path("dispatchId") dispatchId: Long
+    ): Response<ApiResponse<DispatchDetailResponse>>
+
+    @PATCH("/api/driver/me/dispatches/{dispatchId}/end")
     suspend fun updateDispatchFinish(
-        @Path("dispatchId") dispatchId: Long,
-        @Body record: DispatchFinishRequest
-    ): Response<Unit>
+        @Path("dispatchId") dispatchId: Long
+    ): Response<ApiResponse<DispatchDetailResponse>>
 }

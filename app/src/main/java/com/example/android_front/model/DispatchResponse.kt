@@ -1,11 +1,11 @@
 package com.example.android_front.model
 
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 data class DispatchResponse(
     val dispatchId: Long,
-    val username: String,
+    val driverName: String,
     val routeNumber: String,
-    val scheduledDeparture: LocalTime,
+    val scheduledDepartureTime: String,
     val status: DispatchStatus
 )

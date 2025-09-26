@@ -65,26 +65,26 @@ class RecordActivity : AppCompatActivity() {
             try {
                 val response = RetrofitInstance.dispatchApi.getDispatchDetail(dispatchId)
                 withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        val detail: DispatchDetailResponse? = response.body()
-                        if (detail != null) {
-                            // UI 업데이트
-                            tvDriverName.text = "운행자 : ${detail.username}"
-                            tvVehicleNumber.text = "차량 번호 : ${detail.busNumber}"
-                            tvRouteNumber.text = "노선 : ${detail.routeNumber}"
-                            tvDate.text = "날짜 : ${detail.dispatchDate}"
-                            tvDepartureTime.text = "출발 시간 : ${detail.scheduledDeparture}"
-                            tvArrivalTime.text = "도착 시간 : ${detail.actualArrival}"
-                            tvDriveStatus.text = detail.status.displayName
+                    val apiResponse = response.body()
+                    if (response.isSuccessful && apiResponse != null && apiResponse.success && apiResponse.data != null) {
+                        val detail = apiResponse.data
+                        // UI 업데이트
+                        tvDriverName.text = "운행자 : ${detail.driverName}"
+                        tvVehicleNumber.text = "차량 번호 : ${detail.vehicleNumber}"
+                        tvRouteNumber.text = "노선 : ${detail.routeNumber}"
+                        tvDate.text = "날짜 : ${detail.dispatchDate}"
+                        tvDepartureTime.text = "출발 시간 : ${detail.scheduledDepartureTime}"
+                        tvArrivalTime.text = "도착 시간 : ${detail.actualArrivalTime}"
+                        tvDriveStatus.text = detail.status.displayName
 
-                            tvSleepAvg.text = "${detail.drowsinessCount}회"
-                            tvOverSpeed.text = "${detail.accelerationCount}회"
-                            tvUnderSpeed.text = "${detail.brakingCount}회"
-                            tvAbnormal.text = "${detail.abnormalCount}회"
-                        }
+                        tvSleepAvg.text = "${detail.drowsinessCount}회"
+                        tvOverSpeed.text = "${detail.accelerationCount}회"
+                        tvUnderSpeed.text = "${detail.brakingCount}회"
+                        tvAbnormal.text = "${detail.abnormalCount}회"
                     } else {
-                        Toast.makeText(this@RecordActivity, "상세 조회 실패", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RecordActivity, apiResponse?.message ?: "상세 조회 실패", Toast.LENGTH_SHORT).show()
                     }
+
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
