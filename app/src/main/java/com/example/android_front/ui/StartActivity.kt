@@ -93,13 +93,13 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun updateUI(detail: DispatchDetailResponse) {
-        tvDriverName.text = "운행자 : ${detail.driverName}"
-        tvVehicleNumber.text = "차량 번호 : ${detail.vehicleNumber}"
-        tvRouteNumber.text = "노선 : ${detail.routeNumber}"
-        tvDate.text = "날짜 : ${detail.dispatchDate}"
-        tvDepartureTime.text = "출발 예정 시간 : ${detail.scheduledDepartureTime.substringAfter("T")}"
-        tvArrivalTime.text = "도착 예정 시간 : ${detail.scheduledArrivalTime.substringAfter("T")}"
-        tvDriveStatus.text = "상태 : ${detail.status.displayName}"
+        tvDriverName.text = ":  ${detail.driverName}"
+        tvVehicleNumber.text = ":  ${detail.vehicleNumber}"
+        tvRouteNumber.text = ":  ${detail.routeNumber}"
+        tvDate.text = ":  ${detail.dispatchDate}"
+        tvDepartureTime.text = ":  ${detail.scheduledDepartureTime.substringAfter("T")}"
+        tvArrivalTime.text = ":  ${detail.scheduledArrivalTime.substringAfter("T")}"
+        tvDriveStatus.text = ":  ${detail.status.displayName}"
     }
 
     private fun startDispatch() {
@@ -113,6 +113,8 @@ class StartActivity : AppCompatActivity() {
                             // 시작 성공 → RunActivity로 이동
                             val intent = Intent(this@StartActivity, RunActivity::class.java)
                             intent.putExtra("dispatchId", dispatchId)
+                            intent.putExtra("driverName", dispatchDetail?.driverName)
+                            intent.putExtra("dispatchDate", dispatchDetail?.dispatchDate)
                             startActivity(intent)
                             finish()
                         } else {
@@ -137,4 +139,5 @@ class StartActivity : AppCompatActivity() {
             }
         }
     }
+
 }

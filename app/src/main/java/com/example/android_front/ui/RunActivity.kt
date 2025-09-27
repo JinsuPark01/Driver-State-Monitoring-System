@@ -93,6 +93,9 @@ class RunActivity : AppCompatActivity() {
         setContentView(R.layout.activity_drive_run)
 
         dispatchId = intent.getLongExtra("dispatchId", -1)
+        val driverName = intent.getStringExtra("driverName")
+        val dispatchDate = intent.getStringExtra("dispatchDate")
+
         if (dispatchId == -1L) {
             Toast.makeText(this, "잘못된 배차 정보입니다.", Toast.LENGTH_SHORT).show()
             finish()
@@ -109,6 +112,12 @@ class RunActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         modelHandler = ModelHandler(this) // 모델 초기화
 
+        val tvDate = findViewById<TextView>(R.id.tv_date)
+        val tvDriverName = findViewById<TextView>(R.id.tv_driver_name)
+
+        // Intent에서 받은 데이터로 TextView 채우기
+        tvDate.text = dispatchDate ?: "정보 없음"
+        tvDriverName.text = driverName ?: "정보 없음"
         //checkCameraPermission()
         setupEndButton()
 

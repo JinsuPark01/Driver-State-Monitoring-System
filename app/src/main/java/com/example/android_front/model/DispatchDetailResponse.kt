@@ -1,8 +1,5 @@
 package com.example.android_front.model
 
-import java.time.LocalDateTime
-import java.time.LocalTime
-
 data class DispatchDetailResponse(
     val dispatchId: Long,
     val driverName: String,

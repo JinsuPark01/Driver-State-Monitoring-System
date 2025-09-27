@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         btnMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))
         }
+
         tvViewMore.setOnClickListener {
             startActivity(Intent(this, AllScoreActivity::class.java))
         }

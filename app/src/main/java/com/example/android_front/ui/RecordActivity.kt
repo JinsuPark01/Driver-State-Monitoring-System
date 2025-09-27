@@ -15,7 +15,8 @@ import kotlinx.coroutines.withContext
 
 class RecordActivity : AppCompatActivity() {
 
-    private lateinit var tvDriverName: TextView
+    private lateinit var tvName: TextView
+    private lateinit var tvDrivingScore: TextView
     private lateinit var tvVehicleNumber: TextView
     private lateinit var tvRouteNumber: TextView
     private lateinit var tvDate: TextView
@@ -34,7 +35,8 @@ class RecordActivity : AppCompatActivity() {
 
         // View 연결
         val btnBack = findViewById<View>(R.id.btnBack)
-        tvDriverName = findViewById(R.id.tvDriverName)
+        tvName = findViewById(R.id.tv_driver_name)
+        tvDrivingScore = findViewById(R.id.tv_drivingScore)
         tvVehicleNumber = findViewById(R.id.tvVehicleNumber)
         tvRouteNumber = findViewById(R.id.tvRouteNumber)
         tvDate = findViewById(R.id.tvDate)
@@ -69,13 +71,14 @@ class RecordActivity : AppCompatActivity() {
                     if (response.isSuccessful && apiResponse != null && apiResponse.success && apiResponse.data != null) {
                         val detail = apiResponse.data
                         // UI 업데이트
-                        tvDriverName.text = "운행자 : ${detail.driverName}"
-                        tvVehicleNumber.text = "차량 번호 : ${detail.vehicleNumber}"
-                        tvRouteNumber.text = "노선 : ${detail.routeNumber}"
-                        tvDate.text = "날짜 : ${detail.dispatchDate}"
-                        tvDepartureTime.text = "실제 출발 시간 : ${detail.actualDepartureTime?.substringAfter("T") ?: "미기록"}"
-                        tvArrivalTime.text = "실제 도착 시간 : ${detail.actualArrivalTime?.substringAfter("T") ?: "미기록"}"
-                        tvDriveStatus.text = detail.status.displayName
+                        tvName.text = "${detail.driverName} 드라이버"
+                        tvDrivingScore.text = "${detail.drivingScore}점"
+                        tvVehicleNumber.text = ":  ${detail.vehicleNumber}"
+                        tvRouteNumber.text = ":  ${detail.routeNumber}"
+                        tvDate.text = ":  ${detail.dispatchDate}"
+                        tvDepartureTime.text = ":  ${detail.actualDepartureTime?.substringAfter("T") ?: "미기록"}"
+                        tvArrivalTime.text = ":  ${detail.actualArrivalTime?.substringAfter("T") ?: "미기록"}"
+                        tvDriveStatus.text = ":  ${detail.status.displayName}"
 
                         tvSleepAvg.text = "${detail.drowsinessCount}회"
                         tvOverSpeed.text = "${detail.accelerationCount}회"

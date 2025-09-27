@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5">
+
     <!-- 제목 영역 -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,12 +22,12 @@
             android:id="@+id/tv_page_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" 배차 시작"
+            android:text="배차 시작"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
+
     <!-- 메인 영역 -->
-    <!-- 하단 네비게이션 바 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -66,14 +67,19 @@
                     android:src="@drawable/ic_person" />
 
                 <TextView
-                    android:id="@+id/tvDriverName"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:padding="2dp"
-                    android:text="운행자 : 홍길동"
+                    android:fontFamily="monospace"
+                    android:text="운행자"
                     android:textSize="16sp" />
 
+                <TextView
+                    android:id="@+id/tvDriverName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  홍길동"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <!-- 차량 번호 -->
@@ -90,12 +96,18 @@
                     android:src="@drawable/ic_number" />
 
                 <TextView
-                    android:id="@+id/tvVehicleNumber"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:padding="2dp"
-                    android:text="차량 번호 : 21바 5860"
+                    android:fontFamily="monospace"
+                    android:text="차량 번호"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvVehicleNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  21바 5860"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -113,15 +125,21 @@
                     android:src="@drawable/ic_pin" />
 
                 <TextView
-                    android:id="@+id/tvRouteNumber"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:fontFamily="monospace"
+                    android:text="노선 번호"
+                    android:textSize="16sp" />
 
-                    android:padding="2dp"
-                    android:text="노선 번호 : 00"
+                <TextView
+                    android:id="@+id/tvRouteNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  00"
                     android:textSize="16sp" />
             </LinearLayout>
+
             <!-- 날짜 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -136,14 +154,21 @@
                     android:src="@drawable/ic_calendar" />
 
                 <TextView
-                    android:id="@+id/tvDate"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:padding="2dp"
-                    android:text="날짜 : 25/08/10"
+                    android:fontFamily="monospace"
+                    android:text="날짜"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  2025-08-10"
                     android:textSize="16sp" />
             </LinearLayout>
+
             <!-- 출발 시간 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -158,12 +183,18 @@
                     android:src="@drawable/ic_calendar" />
 
                 <TextView
-                    android:id="@+id/tvDepartureTime"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:padding="2dp"
-                    android:text="출발 예정 시간 : 00:00"
+                    android:fontFamily="monospace"
+                    android:text="출발 시간"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvDepartureTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  00:00"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -181,12 +212,18 @@
                     android:src="@drawable/ic_calendar" />
 
                 <TextView
-                    android:id="@+id/tvArrivalTime"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:padding="2dp"
-                    android:text="도착 예정 시간 : 00:00"
+                    android:fontFamily="monospace"
+                    android:text="도착 시간"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvArrivalTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  00:00"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -204,12 +241,18 @@
                     android:src="@drawable/ic_bus" />
 
                 <TextView
-                    android:id="@+id/tvDriveStatus"
-                    android:layout_width="match_parent"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:padding="2dp"
-                    android:text="운행 전"
+                    android:fontFamily="monospace"
+                    android:text="운행 상태"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvDriveStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":  운행 전"
                     android:textColor="@color/blue"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -223,15 +266,14 @@
             android:text="운행 정보에 문제가 있나요?"
             android:textColor="@color/blue"
             android:textSize="14sp" />
-
     </LinearLayout>
 
+    <!-- 하단 네비게이션 바 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 네비게이션 바 본체 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -255,5 +297,4 @@
                 android:background="@drawable/bg_button" />
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

@@ -7,18 +7,19 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+//import com.bumptech.glide.Glide
 import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.api.RetrofitInstance
 import com.example.android_front.model.DispatchResponse
 import com.example.android_front.model.DispatchStatus
+import com.example.android_front.model.UserDetailResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 class MyPageActivity : AppCompatActivity() {
 
@@ -71,8 +72,48 @@ class MyPageActivity : AppCompatActivity() {
             showDatePicker()
         }
 
-        // 초기 데이터 로딩 (어제 날짜)
+        // 초기 데이터 로딩
+        fetchUserDetail()
         fetchDispatchList(currentDate)
+    }
+
+    // 사용자 정보 호출
+    private fun fetchUserDetail() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.userApi.getUserDetail()
+                if (response.isSuccessful) {
+                    val userDetail = response.body()?.data
+                    withContext(Dispatchers.Main) {
+                        userDetail?.let { updateUserUI(it) }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MyPageActivity, "사용자 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MyPageActivity, "네트워크 오류: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // UI 업데이트
+    private fun updateUserUI(user: UserDetailResponse) {
+        tvDriverName.text = "${user.username} 드라이버"
+        findViewById<TextView>(R.id.tv_licenseNumber).text = ":  ${user.licenseNumber ?: "-"}"
+        findViewById<TextView>(R.id.tv_grade).text = ":  ${user.grade ?: "-"}"
+        findViewById<TextView>(R.id.tv_careerYear).text = ":  ${user.careerYears ?: 0}년"
+        findViewById<TextView>(R.id.tv_operator).text = ":  ${user.operatorName ?: "-"}"
+        findViewById<TextView>(R.id.tv_phoneNumber).text = ":  ${user.phoneNumber ?: "-"}"
+
+        // 이미지 로딩 (Glide)
+//        user.imagePath?.let { url ->
+//            val ivProfile = findViewById<ImageView>(R.id.iv_profile)
+//            Glide.with(this).load(url).into(ivProfile)
+//        }
     }
 
     private fun showDatePicker() {
