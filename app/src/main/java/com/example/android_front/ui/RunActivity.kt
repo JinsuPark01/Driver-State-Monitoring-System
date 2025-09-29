@@ -27,6 +27,8 @@ import com.example.android_front.api.TokenManager
 import com.example.android_front.model.WarningType
 import com.example.android_front.service.SocketService
 import com.example.android_front.websocket.WebSocketManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,6 +61,8 @@ class RunActivity : AppCompatActivity() {
 
     private var dispatchId: Long = -1
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as SocketService.SocketBinder
@@ -77,14 +81,24 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
-    // 런타임 권한 요청 결과
-    private val requestPermissionLauncher =
+    // 카메라 권한 요청
+    private val requestCameraPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                checkLocationPermissionAndStartCamera()
+            } else {
+                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
+
+    // 위치 권한 요청
+    private val requestLocationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
                 startCamera()
             } else {
-                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-                finish()
+                Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -110,25 +124,27 @@ class RunActivity : AppCompatActivity() {
 
         previewView = findViewById(R.id.viewFinder)
         cameraExecutor = Executors.newSingleThreadExecutor()
-        modelHandler = ModelHandler(this) // 모델 초기화
+        modelHandler = ModelHandler(this)
 
         val tvDate = findViewById<TextView>(R.id.tv_date)
         val tvDriverName = findViewById<TextView>(R.id.tv_driver_name)
 
-        // Intent에서 받은 데이터로 TextView 채우기
         tvDate.text = dispatchDate ?: "정보 없음"
         tvDriverName.text = driverName ?: "정보 없음"
-        //checkCameraPermission()
+
         setupEndButton()
 
-        // 🚀 WebSocket 연결
+        // WebSocket 연결
         WebSocketManager.connect(
             token = TokenManager.token ?: "",
             onConnected = { Log.d("WebSocket", "Connected with JWT") },
             onError = { error -> Log.e("WebSocket", "STOMP connection failed: ${error.message}") }
         )
 
-        //임시 이벤트 발생 버튼
+        // 위치 클라이언트 초기화
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // 테스트 버튼 이벤트
         tvAbnormal.setOnClickListener {
             onAbnormalBehaviorDetected()
             Toast.makeText(this, "테스트: 이상행동 이벤트 발생", Toast.LENGTH_SHORT).show()
@@ -149,6 +165,15 @@ class RunActivity : AppCompatActivity() {
             sendWarning(WarningType.BRAKING)
             Toast.makeText(this, "테스트: 급제동 이벤트 발생", Toast.LENGTH_SHORT).show()
         }
+
+        // 앱 시작 시 카메라 권한 체크
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            checkLocationPermissionAndStartCamera()
+        }
     }
 
     override fun onStart() {
@@ -167,15 +192,16 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
-//    private fun checkCameraPermission() {
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-//            == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            startCamera()
-//        } else {
-//            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-//        }
-//    }
+    /** 카메라 시작 전 위치 권한 체크 */
+    private fun checkLocationPermissionAndStartCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            startCamera()
+        }
+    }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -194,8 +220,9 @@ class RunActivity : AppCompatActivity() {
                         modelHandler.analyzeImage(imageProxy) { result ->
                             runOnUiThread {
                                 when (result) {
-                                    "DROWSINESS" -> onDrowsinessDetected()
                                     "ABNORMAL" -> onAbnormalBehaviorDetected()
+                                    "DROWSINESS" -> onDrowsinessDetected()
+                                    else -> { /* NORMAL */ }
                                 }
                             }
                         }
@@ -224,12 +251,32 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
-    /** 경고 이벤트 WebSocket 전송 */
+    /** 현재 위치 가져오기 */
+    private fun getCurrentLocation(onLocationReady: (Double, Double) -> Unit) {
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    onLocationReady(location.latitude, location.longitude)
+                } else {
+                    Log.w("RunActivity", "위치를 가져오지 못했습니다 (null)")
+                    onLocationReady(0.0, 0.0)
+                }
+            }
+        } else {
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
     private fun sendWarning(type: WarningType) {
         val warningTime = LocalTime.now().toString()
-        WebSocketManager.sendDriveEvent(dispatchId, type.name, warningTime)
-        runOnUiThread {
-            Toast.makeText(this, "${type.name} 이벤트 전송됨", Toast.LENGTH_SHORT).show()
+        getCurrentLocation { lat, lon ->
+            WebSocketManager.sendDriveEvent(dispatchId, type.name, warningTime, lat, lon)
+            runOnUiThread {
+                Toast.makeText(this, "${type.name} 이벤트 전송됨", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -277,7 +324,6 @@ class RunActivity : AppCompatActivity() {
         sendWarning(WarningType.ABNORMAL)
     }
 
-    /** 운행 종료는 HTTP 그대로 */
     private fun sendDrivingFinish() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {

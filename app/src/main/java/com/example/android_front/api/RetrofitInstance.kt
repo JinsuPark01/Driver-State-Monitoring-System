@@ -55,4 +55,13 @@ object RetrofitInstance {
             .build()
             .create(WarningApi::class.java)
     }
+
+    val notificationApi: NotificationApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client) // 토큰 자동 추가
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(NotificationApi::class.java)
+    }
 }

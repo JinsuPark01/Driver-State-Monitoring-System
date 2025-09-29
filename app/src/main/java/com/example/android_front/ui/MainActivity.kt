@@ -2,7 +2,9 @@ package com.example.android_front.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -12,25 +14,32 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
+import com.example.android_front.adapter.NotificationAdapter
 import com.example.android_front.adapter.ScoreAdapter
 import com.example.android_front.api.RetrofitInstance
+import com.example.android_front.api.TokenManager
 import com.example.android_front.model.DispatchResponse
 import com.example.android_front.model.DispatchStatus
+import com.example.android_front.model.NotificationResponse
 import com.example.android_front.model.UserDetailResponse
+import com.example.android_front.websocket.WebSocketManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var tvPageTitle: TextView
 
+    private lateinit var tvPageTitle: TextView
+    private lateinit var ivAlarm: ImageView
     private lateinit var tvViewMore: TextView
     private lateinit var btnMyPage: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
     private lateinit var rvDrivingScores: RecyclerView
     private lateinit var scoreAdapter: ScoreAdapter
+    private lateinit var vRedDot: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +51,13 @@ class MainActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.viewPager)
         indicatorLayout = findViewById(R.id.indicator_layout)
         rvDrivingScores = findViewById(R.id.rvDrivingScores)
+        ivAlarm = findViewById(R.id.iv_alarm)
+        vRedDot = findViewById(R.id.iv_newAlarm)
+
+        // 알람 버튼 클릭
+        ivAlarm.setOnClickListener {
+            showNotificationPopup()
+        }
 
         // Score RecyclerView 세팅 (수평)
         rvDrivingScores.layoutManager =
@@ -57,6 +73,28 @@ class MainActivity : AppCompatActivity() {
 
         fetchUserDetail()
         fetchDispatchList()
+
+        // WebSocket 연결
+        val token = TokenManager.token
+        if (!token.isNullOrEmpty()) {
+            WebSocketManager.connect(
+                token = token,
+                onConnected = {
+                    // 구독: 사용자 알림 큐
+                    WebSocketManager.subscribeTopic("/user/queue/notifications") { payload ->
+                        // 알림 도착 시 UI에 반영
+                        runOnUiThread {
+                            vRedDot.visibility = View.VISIBLE // 빨간 점 표시
+                        }
+                    }
+                },
+                onError = { error ->
+                    runOnUiThread {
+                        Toast.makeText(this, "웹소켓 연결 실패: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+        }
     }
 
     /** 유저 정보 및 평균 점수 조회 */
@@ -68,10 +106,7 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val data: UserDetailResponse? = response.body()?.data
                         if (data != null) {
-                            // 1. 유저 이름 + "님" 표시
                             tvPageTitle.text = "${data.username}님"
-
-                            // 2. 평균 점수 표시
                             scoreAdapter = ScoreAdapter(data)
                             rvDrivingScores.adapter = scoreAdapter
                         } else {
@@ -141,6 +176,63 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** 알림 BottomSheetDialog 띄우기 */
+    private fun showNotificationPopup() {
+        val dialog = BottomSheetDialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.popup_notifications, null)
+        dialog.setContentView(view)
+
+        val rvNotifications = view.findViewById<RecyclerView>(R.id.rvNotifications)
+        rvNotifications.layoutManager = LinearLayoutManager(this)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.notificationApi.getMyNotifications()
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        val notifications: List<NotificationResponse> =
+                            response.body()?.data ?: emptyList()
+                        val adapter = NotificationAdapter(notifications)
+                        rvNotifications.adapter = adapter
+
+                        // 닫기 버튼 처리
+                        val ivClose = view.findViewById<ImageView>(R.id.ivClosePopup)
+                        ivClose.setOnClickListener {
+                            notifications.filter { !it.isRead }.forEach { notif ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+                                        RetrofitInstance.notificationApi.markNotificationRead(notif.notificationId)
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                            }
+                            // 빨간 점 제거
+                            vRedDot.visibility = View.INVISIBLE
+                            dialog.dismiss()
+                        }
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            response.body()?.message ?: "알림 조회 실패",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "네트워크 오류: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
     /** ViewPager2 세팅 */
     private fun setupViewPager(dispatchList: List<DispatchResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
@@ -168,7 +260,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-
         setupIndicators(dispatchList.size)
         setCurrentIndicator(0)
 
@@ -207,6 +298,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         fetchUserDetail()
-        fetchDispatchList() // 화면 복귀 시 배차 리스트 최신화
+        fetchDispatchList()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        WebSocketManager.disconnect()
     }
 }

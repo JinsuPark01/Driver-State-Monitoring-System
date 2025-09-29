@@ -81,4 +81,13 @@ dependencies {
 
     //Gson (JSON 직렬화)
     implementation("com.google.code.gson:gson:2.10.1")
+
+    //GPS
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    //파이토치 모바일
+    implementation("org.pytorch:pytorch_android:1.9.0")
+    implementation("org.pytorch:pytorch_android_torchvision:1.9.0")
+
+
 }

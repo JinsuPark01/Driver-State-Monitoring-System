@@ -29,14 +29,14 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // 자동 로그인 체크
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        val token = prefs.getString("token", null)
-        if (!token.isNullOrEmpty()) {
-            TokenManager.token = token // 인터셉터용
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return
-        }
+//        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
+//        val token = prefs.getString("token", null)
+//        if (!token.isNullOrEmpty()) {
+//            TokenManager.token = token // 인터셉터용
+//            startActivity(Intent(this, MainActivity::class.java))
+//            finish()
+//            return
+//        }
 
         setContentView(R.layout.activity_sign_in)
 

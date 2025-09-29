@@ -80,8 +80,14 @@ object WebSocketManager {
         stompClient.connect(headers)
     }
 
-    /** 운행 이벤트 전송 */
-    fun sendDriveEvent(dispatchId: Long, eventType: String, eventTimestamp: String = "") {
+    /** 운행 이벤트 전송 (위치 포함) */
+    fun sendDriveEvent(
+        dispatchId: Long,
+        eventType: String,
+        eventTimestamp: String = "",
+        latitude: Double? = null,
+        longitude: Double? = null
+    ) {
         if (!::stompClient.isInitialized) {
             Log.e(TAG, "STOMP client not initialized. Call connect() first.")
             return
@@ -92,13 +98,20 @@ object WebSocketManager {
         }
 
         // 빈 문자열이면 현재 시간 ISO_LOCAL_DATE_TIME 형식으로
-        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+        val timestamp = if (eventTimestamp.isEmpty()) {
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+        } else eventTimestamp
 
-        val payload = mapOf(
+        // 기본 payload
+        val payload = mutableMapOf<String, Any>(
             "dispatchId" to dispatchId,
             "eventType" to eventType,
             "eventTimestamp" to timestamp
         )
+
+        // 위치 있으면 추가
+        latitude?.let { payload["latitude"] = it }
+        longitude?.let { payload["longitude"] = it }
 
         val json = gson.toJson(payload)
         disposables.add(

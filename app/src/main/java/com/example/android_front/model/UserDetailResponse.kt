@@ -1,7 +1,5 @@
 package com.example.android_front.model
 
-import java.math.BigDecimal
-
 data class UserDetailResponse(
     val userId: Int,
     val email: String,
