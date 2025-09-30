@@ -85,9 +85,9 @@ dependencies {
     //GPS
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
-    //파이토치 모바일
-    implementation("org.pytorch:pytorch_android:1.9.0")
-    implementation("org.pytorch:pytorch_android_torchvision:1.9.0")
+    //파이토치 모바일 (Android 최신 안정 버전)
+    implementation("org.pytorch:pytorch_android:1.13.1")
+    implementation("org.pytorch:pytorch_android_torchvision:1.13.1")
 
 
 }
