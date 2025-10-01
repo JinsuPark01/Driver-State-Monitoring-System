@@ -32,7 +32,9 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -133,13 +135,6 @@ class RunActivity : AppCompatActivity() {
         tvDriverName.text = driverName ?: "정보 없음"
 
         setupEndButton()
-
-        // WebSocket 연결
-        WebSocketManager.connect(
-            token = TokenManager.token ?: "",
-            onConnected = { Log.d("WebSocket", "Connected with JWT") },
-            onError = { error -> Log.e("WebSocket", "STOMP connection failed: ${error.message}") }
-        )
 
         // 위치 클라이언트 초기화
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -271,7 +266,8 @@ class RunActivity : AppCompatActivity() {
     }
 
     private fun sendWarning(type: WarningType) {
-        val warningTime = LocalTime.now().toString()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val warningTime = LocalDateTime.now().format(formatter)  // ✅ LocalDateTime 사용
         getCurrentLocation { lat, lon ->
             WebSocketManager.sendDriveEvent(dispatchId, type.name, warningTime, lat, lon)
             runOnUiThread {
@@ -347,6 +343,5 @@ class RunActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-        WebSocketManager.disconnect()
     }
 }

@@ -1,6 +1,9 @@
 package com.example.android_front.websocket
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import com.example.android_front.api.TokenManager
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -8,9 +11,12 @@ import okhttp3.OkHttpClient
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
+import ua.naiksoftware.stomp.dto.StompCommand
 import ua.naiksoftware.stomp.dto.StompHeader
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import ua.naiksoftware.stomp.dto.StompMessage
+
 
 object WebSocketManager {
 
@@ -20,13 +26,26 @@ object WebSocketManager {
     private val gson = Gson()
     private var isConnected: Boolean = false
 
-    /** STOMP 서버 연결 */
+    // 재연결 관련
+    private var reconnectAttempts = 0
+    private const val MAX_RECONNECT = 5
+    private const val RECONNECT_DELAY_MS = 3000L
+    private val handler = Handler(Looper.getMainLooper())
+
+    /**
+     * STOMP 서버 연결
+     */
     fun connect(
-        token: String,  // JWT 토큰
+        token: String? = TokenManager.token,
         onConnected: (() -> Unit)? = null,
         onError: ((Throwable) -> Unit)? = null
     ) {
-        // ✅ Handshake 단계에서 Authorization 헤더 추가
+        if (token.isNullOrEmpty()) {
+            Log.w(TAG, "connect() called but token is null. Skipping connection.")
+            return
+        }
+
+        // ✅ OkHttpClient with Authorization header
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val newRequest = chain.request().newBuilder()
@@ -36,19 +55,18 @@ object WebSocketManager {
             }
             .build()
 
+        // ✅ Create STOMP client
         stompClient = Stomp.over(
             Stomp.ConnectionProvider.OKHTTP,
-            "ws://10.0.2.2:8080/ws-native",
+            "ws://10.50.2.93:8080/ws-native",
             null,
             okHttpClient
         )
 
-        // ✅ STOMP CONNECT 프레임에서도 토큰 전달
-        val headers = listOf(
-            StompHeader("Authorization", "Bearer $token")
-        )
+        // ✅ STOMP CONNECT frame header
+        val headers = listOf(StompHeader("Authorization", "Bearer $token"))
 
-        // 연결 상태 구독
+        // lifecycle 구독
         disposables.add(
             stompClient.lifecycle()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -57,30 +75,50 @@ object WebSocketManager {
                         LifecycleEvent.Type.OPENED -> {
                             Log.d(TAG, "STOMP Connected")
                             isConnected = true
+                            reconnectAttempts = 0
                             onConnected?.invoke()
                         }
                         LifecycleEvent.Type.ERROR -> {
                             Log.e(TAG, "STOMP Error: ${event.exception?.message}")
                             isConnected = false
                             onError?.invoke(event.exception ?: Throwable("Unknown STOMP error"))
+                            attemptReconnect()
                         }
                         LifecycleEvent.Type.CLOSED -> {
                             Log.d(TAG, "STOMP Closed")
                             isConnected = false
+                            attemptReconnect()
                         }
                         LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> {
                             Log.e(TAG, "STOMP Failed server heartbeat")
                             isConnected = false
+                            attemptReconnect()
                         }
                     }
                 }
         )
 
-        // ✅ handshake + STOMP CONNECT 둘 다 토큰 적용
         stompClient.connect(headers)
     }
 
-    /** 운행 이벤트 전송 (위치 포함) */
+    /**
+     * 자동 재연결 시도
+     */
+    private fun attemptReconnect() {
+        if (reconnectAttempts >= MAX_RECONNECT) {
+            Log.w(TAG, "Max reconnect attempts reached. Stop trying.")
+            return
+        }
+        reconnectAttempts++
+        Log.d(TAG, "Reconnecting... attempt $reconnectAttempts")
+        handler.postDelayed({
+            connect(TokenManager.token)
+        }, RECONNECT_DELAY_MS)
+    }
+
+    /**
+     * 운행 이벤트 전송
+     */
     fun sendDriveEvent(
         dispatchId: Long,
         eventType: String,
@@ -88,51 +126,60 @@ object WebSocketManager {
         latitude: Double? = null,
         longitude: Double? = null
     ) {
-        if (!::stompClient.isInitialized) {
-            Log.e(TAG, "STOMP client not initialized. Call connect() first.")
-            return
-        }
-        if (!isConnected) {
+        if (!::stompClient.isInitialized || !isConnected) {
             Log.e(TAG, "STOMP not connected. Event is dropped: type=$eventType")
             return
         }
 
-        // 빈 문자열이면 현재 시간 ISO_LOCAL_DATE_TIME 형식으로
-        val timestamp = if (eventTimestamp.isEmpty()) {
+        val timestamp = eventTimestamp.ifEmpty {
             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
-        } else eventTimestamp
+        }
 
-        // 기본 payload
         val payload = mutableMapOf<String, Any>(
             "dispatchId" to dispatchId,
             "eventType" to eventType,
             "eventTimestamp" to timestamp
         )
-
-        // 위치 있으면 추가
         latitude?.let { payload["latitude"] = it }
         longitude?.let { payload["longitude"] = it }
 
         val json = gson.toJson(payload)
+
+        // ✅ SEND 프레임용 StompMessage 생성
+        val headers = listOf(
+            StompHeader("destination", "/app/drive-events"),
+            StompHeader("Authorization", "Bearer ${TokenManager.token}")
+        )
+
+        val message = StompMessage(StompCommand.SEND, headers, json)
+
         disposables.add(
-            stompClient.send("/app/drive-events", json)
+            stompClient.send(message)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Log.d(TAG, "Event sent: $json")
+                    Log.d(TAG, "Event sent with headers: $json")
                 }, { error ->
                     Log.e(TAG, "Send error: ${error.message}")
                 })
         )
     }
 
-    /** 서버 메시지 구독 */
-    fun subscribeTopic(topic: String, onMessageReceived: (String) -> Unit) {
-        if (!::stompClient.isInitialized) {
-            Log.e(TAG, "STOMP client not initialized. Call connect() first.")
+
+    /**
+     * 서버 메시지 구독
+     */
+    fun subscribeTopic(
+        topic: String,
+        headers: List<StompHeader> = emptyList(),
+        onMessageReceived: (String) -> Unit
+    ) {
+        if (!::stompClient.isInitialized || !isConnected) {
+            Log.e(TAG, "STOMP not connected. Subscription failed: $topic")
             return
         }
+
         disposables.add(
-            stompClient.topic(topic)
+            stompClient.topic(topic, headers)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ stompMessage ->
                     onMessageReceived(stompMessage.payload)
@@ -142,7 +189,9 @@ object WebSocketManager {
         )
     }
 
-    /** 연결 종료 */
+    /**
+     * 연결 종료
+     */
     fun disconnect() {
         disposables.clear()
         if (::stompClient.isInitialized) {
@@ -153,6 +202,7 @@ object WebSocketManager {
             }
         }
         isConnected = false
+        reconnectAttempts = 0
         Log.d(TAG, "STOMP Disconnected")
     }
 }

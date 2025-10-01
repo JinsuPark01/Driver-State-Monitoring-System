@@ -1,3 +1,4 @@
+//메인
 package com.example.android_front.ui
 
 import android.content.Intent
@@ -22,12 +23,14 @@ import com.example.android_front.model.DispatchResponse
 import com.example.android_front.model.DispatchStatus
 import com.example.android_front.model.NotificationResponse
 import com.example.android_front.model.UserDetailResponse
+import com.example.android_front.websocket.NotificationState
 import com.example.android_front.websocket.WebSocketManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.lifecycle.Observer
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,6 +57,11 @@ class MainActivity : AppCompatActivity() {
         ivAlarm = findViewById(R.id.iv_alarm)
         vRedDot = findViewById(R.id.iv_newAlarm)
 
+        // LiveData 관찰하여 빨간 점 상태 반영
+        NotificationState.hasNewNotification.observe(this, Observer { hasNew ->
+            vRedDot.visibility = if (hasNew) View.VISIBLE else View.INVISIBLE
+        })
+
         // 알람 버튼 클릭
         ivAlarm.setOnClickListener {
             showNotificationPopup()
@@ -73,28 +81,6 @@ class MainActivity : AppCompatActivity() {
 
         fetchUserDetail()
         fetchDispatchList()
-
-        // WebSocket 연결
-        val token = TokenManager.token
-        if (!token.isNullOrEmpty()) {
-            WebSocketManager.connect(
-                token = token,
-                onConnected = {
-                    // 구독: 사용자 알림 큐
-                    WebSocketManager.subscribeTopic("/user/queue/notifications") { payload ->
-                        // 알림 도착 시 UI에 반영
-                        runOnUiThread {
-                            vRedDot.visibility = View.VISIBLE // 빨간 점 표시
-                        }
-                    }
-                },
-                onError = { error ->
-                    runOnUiThread {
-                        Toast.makeText(this, "웹소켓 연결 실패: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            )
-        }
     }
 
     /** 유저 정보 및 평균 점수 조회 */
@@ -207,8 +193,8 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 }
                             }
-                            // 빨간 점 제거
-                            vRedDot.visibility = View.INVISIBLE
+                            // 빨간 점 제거 (LiveData 상태 변경)
+                            NotificationState.hideRedDot()
                             dialog.dismiss()
                         }
                     } else {
@@ -303,6 +289,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        WebSocketManager.disconnect()
     }
 }
