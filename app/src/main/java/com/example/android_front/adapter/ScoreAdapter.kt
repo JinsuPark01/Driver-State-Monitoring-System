@@ -33,11 +33,11 @@ class ScoreAdapter(private val userDetail: UserDetailResponse) :
     override fun onBindViewHolder(holder: ScoreViewHolder, position: Int) {
         holder.tvLabel.text = labels[position]
         val value = when (position) {
-            0 -> userDetail.avgDrivingScore ?: 100.0
-            1 -> userDetail.avgDrowsinessCount ?: 0.0
-            2 -> userDetail.avgAccelerationCount ?: 0.0
-            3 -> userDetail.avgBrakingCount ?: 0.0
-            4 -> userDetail.avgAbnormalCount ?: 0.0
+            0 -> userDetail.payload.avgDrivingScore ?: 100.0
+            1 -> userDetail.payload.avgDrowsinessCount ?: 0.0
+            2 -> userDetail.payload.avgAccelerationCount ?: 0.0
+            3 -> userDetail.payload.avgBrakingCount ?: 0.0
+            4 -> userDetail.payload.avgAbnormalCount ?: 0.0
             else -> 0.0
         }
         holder.tvValue.text = value.toString()

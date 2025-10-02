@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.android_front"
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- 간단한 네트워크 권한만 -->
@@ -46,7 +47,6 @@
         <activity android:name=".ui.RecordActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.MyPageActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.AllScoreActivity" android:exported="true" android:screenOrientation="portrait" />
-
         <service
             android:name=".service.SocketService"
             android:enabled="true"

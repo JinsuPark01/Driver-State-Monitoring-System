@@ -89,5 +89,6 @@ dependencies {
     implementation("org.pytorch:pytorch_android:1.13.1")
     implementation("org.pytorch:pytorch_android_torchvision:1.13.1")
 
-
+    //카카오맵
+    implementation("com.kakao.maps.open:android:2.12.18")
 }

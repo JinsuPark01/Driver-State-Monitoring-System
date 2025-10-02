@@ -11,9 +11,4 @@ data class DispatchDetailResponse(
     val scheduledArrivalTime: String,
     val actualDepartureTime: String?,
     val actualArrivalTime: String?,
-//    val drowsinessCount: Int?,
-//    val accelerationCount: Int?,
-//    val brakingCount: Int?,
-//    val abnormalCount: Int?,
-//    val drivingScore: Int?
 )

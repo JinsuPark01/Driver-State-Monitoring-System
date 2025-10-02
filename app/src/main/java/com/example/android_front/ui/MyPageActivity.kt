@@ -103,9 +103,9 @@ class MyPageActivity : AppCompatActivity() {
     // UI 업데이트
     private fun updateUserUI(user: UserDetailResponse) {
         tvDriverName.text = "${user.username} 드라이버"
-        findViewById<TextView>(R.id.tv_licenseNumber).text = ":  ${user.licenseNumber ?: "-"}"
-        findViewById<TextView>(R.id.tv_grade).text = ":  ${user.grade ?: "-"}"
-        findViewById<TextView>(R.id.tv_careerYear).text = ":  ${user.careerYears ?: 0}년"
+        findViewById<TextView>(R.id.tv_licenseNumber).text = ":  ${user.payload.licenseNumber ?: "-"}"
+        findViewById<TextView>(R.id.tv_grade).text = ":  ${user.payload.grade ?: "-"}"
+        findViewById<TextView>(R.id.tv_careerYear).text = ":  ${user.payload.careerYears ?: "-"}년"
         findViewById<TextView>(R.id.tv_operator).text = ":  ${user.operatorName ?: "-"}"
         findViewById<TextView>(R.id.tv_phoneNumber).text = ":  ${user.phoneNumber ?: "-"}"
 

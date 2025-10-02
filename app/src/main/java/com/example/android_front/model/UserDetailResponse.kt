@@ -9,12 +9,5 @@ data class UserDetailResponse(
     val role: String,
     val operatorId: Int?,
     val operatorName: String?,
-    val licenseNumber: String?,
-    val careerYears: Int?,
-    val grade: String?,
-    val avgDrowsinessCount: Double?,
-    val avgAccelerationCount: Double?,
-    val avgBrakingCount: Double?,
-    val avgAbnormalCount: Double?,
-    val avgDrivingScore: Double?
+    val payload: UserDetailPayload
 )

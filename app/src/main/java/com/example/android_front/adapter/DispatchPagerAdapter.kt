@@ -59,10 +59,10 @@ class DispatchPagerAdapter(
         if (holder is ViewHolder) {
             val item = items[position]
 
-            holder.tvDriverName.text = "운행자 : ${item.driverName ?: "알 수 없음"}"
-            holder.tvRouteNumber.text = "노선 : ${item.routeNumber ?: "-"}"
-            holder.tvDepartureTime.text = "출발 예정 시간 : ${item.scheduledDepartureTime.substringAfter("T")}"
-            holder.tvDriveStatus.text = "상태 : ${item.status.displayName ?: "-"}"
+            holder.tvDriverName.text = ":  ${item.driverName ?: "알 수 없음"}"
+            holder.tvRouteNumber.text = ":  ${item.routeNumber ?: "-"}"
+            holder.tvDepartureTime.text = ":  ${item.scheduledDepartureTime.substringAfter("T")}"
+            holder.tvDriveStatus.text = ":  ${item.status.displayName ?: "-"}"
 
             // next_action 업데이트
             holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when (item.status) {

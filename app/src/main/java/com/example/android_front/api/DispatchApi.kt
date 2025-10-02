@@ -2,6 +2,7 @@ package com.example.android_front.api
 
 import com.example.android_front.model.ApiResponse
 import com.example.android_front.model.DispatchDetailResponse
+import com.example.android_front.model.DispatchEventsResponse
 import com.example.android_front.model.DispatchRecordResponse
 import com.example.android_front.model.DispatchResponse
 import retrofit2.Response
@@ -27,6 +28,12 @@ interface DispatchApi {
     suspend fun getDispatchRecord(
         @Path("dispatchId") dispatchId: Long
     ): Response<ApiResponse<DispatchRecordResponse>>
+
+    @GET("/api/driver/me/dispatches/{dispatchId}/events")
+    suspend fun getDispatchEvents(
+        @Path("dispatchId") dispatchId: Long
+    ): Response<ApiResponse<List<DispatchEventsResponse>>>
+
 
     @PATCH("/api/driver/me/dispatches/{dispatchId}/start")
     suspend fun updateDispatchStart(

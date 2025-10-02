@@ -3,12 +3,12 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:background="@drawable/bg_drive_card"
-    android:padding="12dp"
+    android:paddingHorizontal="16dp"
     >
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="150dp"
+        android:layout_height="130dp"
         android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center_vertical">
@@ -16,8 +16,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="2dp">
 
             <ImageView
@@ -26,22 +26,27 @@
                 android:src="@drawable/ic_person" />
 
             <TextView
-                android:id="@+id/tvDriverName"
-                android:layout_width="match_parent"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="운행자 : 홍길동"
-                android:padding="2dp"
+                android:fontFamily="monospace"
+                android:text="운행 기사"
                 android:textSize="16sp" />
 
+            <TextView
+                android:id="@+id/tvDriverName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":  홍길동"
+                android:textSize="16sp" />
         </LinearLayout>
 
         <!-- 노선 번호 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="2dp">
 
             <ImageView
@@ -50,13 +55,18 @@
                 android:src="@drawable/ic_pin" />
 
             <TextView
-                android:id="@+id/tvRouteNumber"
-                android:layout_width="match_parent"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:fontFamily="monospace"
+                android:text="노선 번호"
+                android:textSize="16sp" />
 
-                android:text="노선 번호 : 00"
-                android:padding="2dp"
+            <TextView
+                android:id="@+id/tvRouteNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":  00"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -64,8 +74,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="2dp">
 
             <ImageView
@@ -74,12 +84,18 @@
                 android:src="@drawable/ic_calendar" />
 
             <TextView
-                android:id="@+id/tvDepartureTime"
-                android:layout_width="match_parent"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="출발 시간 : 00:00"
-                android:padding="2dp"
+                android:fontFamily="monospace"
+                android:text="출발 시간"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvDepartureTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":  00:00"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -87,8 +103,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="2dp">
 
             <ImageView
@@ -97,14 +113,20 @@
                 android:src="@drawable/ic_bus" />
 
             <TextView
-                android:id="@+id/tvDriveStatus"
-                android:layout_width="match_parent"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="운행 전"
-                android:padding="2dp"
-                android:textSize="16sp"
-                android:textColor="@color/blue" />
+                android:fontFamily="monospace"
+                android:text="운행 상태"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvDriveStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":  운행 전"
+                android:textColor="@color/blue"
+                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
     <LinearLayout

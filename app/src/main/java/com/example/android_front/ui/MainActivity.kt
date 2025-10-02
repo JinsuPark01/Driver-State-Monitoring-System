@@ -181,9 +181,14 @@ class MainActivity : AppCompatActivity() {
                         val adapter = NotificationAdapter(notifications)
                         rvNotifications.adapter = adapter
 
-                        // 닫기 버튼 처리
+                        // X 버튼 클릭 처리
                         val ivClose = view.findViewById<ImageView>(R.id.ivClosePopup)
                         ivClose.setOnClickListener {
+                            dialog.dismiss()
+                        }
+
+                        // 모든 닫힘 이벤트에 동일한 동작 적용
+                        dialog.setOnDismissListener {
                             notifications.filter { !it.isRead }.forEach { notif ->
                                 CoroutineScope(Dispatchers.IO).launch {
                                     try {
@@ -193,10 +198,12 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 }
                             }
-                            // 빨간 점 제거 (LiveData 상태 변경)
                             NotificationState.hideRedDot()
-                            dialog.dismiss()
                         }
+
+                        // 다이얼로그 닫힘 설정
+                        dialog.setCancelable(true)
+                        dialog.setCanceledOnTouchOutside(true)
                     } else {
                         Toast.makeText(
                             this@MainActivity,
