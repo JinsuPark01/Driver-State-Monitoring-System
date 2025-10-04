@@ -28,7 +28,8 @@ class SocketService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    private val speedChannel = Channel<Float>(Channel.BUFFERED)
+    // OBD 데이터 수신용 채널
+    private val obdChannel = Channel<ObdData>(Channel.BUFFERED)
 
     private val _serverReady = MutableStateFlow(false)
     val serverReady: StateFlow<Boolean> = _serverReady
@@ -37,7 +38,7 @@ class SocketService : Service() {
     private var isRunning = AtomicBoolean(true)
 
     // 약한 참조로 메모리 릭 방지
-    private var speedCallbackRef: WeakReference<((Float) -> Unit)?> = WeakReference(null)
+    private var obdCallbackRef: WeakReference<((ObdData) -> Unit)?> = WeakReference(null)
 
     inner class SocketBinder : Binder() {
         fun getService(): SocketService = this@SocketService
@@ -48,7 +49,7 @@ class SocketService : Service() {
     override fun onCreate() {
         super.onCreate()
         startSocketServer()
-        startSpeedProcessing()
+        startObdProcessing()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -56,28 +57,27 @@ class SocketService : Service() {
         return START_STICKY
     }
 
-    fun setSpeedCallback(callback: (Float) -> Unit) {
-        speedCallbackRef = WeakReference(callback)
+    fun setObdCallback(callback: (ObdData) -> Unit) {
+        obdCallbackRef = WeakReference(callback)
     }
 
-    fun removeSpeedCallback() {
-        speedCallbackRef.clear()
+    fun removeObdCallback() {
+        obdCallbackRef.clear()
     }
 
-    private fun startSpeedProcessing() {
+    private fun startObdProcessing() {
         dataProcessingJob?.cancel()
         dataProcessingJob = scope.launch(Dispatchers.Default) {
             try {
-                speedChannel.consumeAsFlow()
+                obdChannel.consumeAsFlow()
                     .buffer(Channel.BUFFERED)
-                    .distinctUntilChanged()
-                    .collect { speed ->
+                    .collect { obdData ->
                         withContext(Dispatchers.Main) {
-                            speedCallbackRef.get()?.invoke(speed)
+                            obdCallbackRef.get()?.invoke(obdData)
                         }
                     }
             } catch (e: Exception) {
-                Log.e(TAG, "속도 데이터 처리 중 오류", e)
+                Log.e(TAG, "OBD 데이터 처리 중 오류", e)
             }
         }
     }
@@ -134,42 +134,59 @@ class SocketService : Service() {
             val buffer = CharArray(128)
 
             while (isRunning.get() && !client.isClosed) {
-                val read = reader.read(buffer)
-                if (read <= 0) {
-                    Log.d(TAG, "클라이언트 연결 종료")
-                    break
-                }
+                try {
+                    val read = reader.read(buffer)
+                    if (read <= 0) {
+                        Log.d(TAG, "클라이언트 연결 종료")
+                        break
+                    }
 
-                val data = String(buffer, 0, read).trim()
-                data.split("\n").forEach { line ->
-                    parseIncomingData(line)
+                    val data = String(buffer, 0, read).trim()
+                    data.split("\n").forEach { line ->
+                        parseIncomingData(line)
+                    }
+                } catch (e: java.net.SocketTimeoutException) {
+                    Log.w(TAG, "읽기 타임아웃 발생, 계속 대기")
+                    continue // 타임아웃 시 루프 유지
+                } catch (e: Exception) {
+                    Log.e(TAG, "클라이언트 처리 오류", e)
+                    break // 다른 예외는 종료
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "클라이언트 처리 오류", e)
+            Log.e(TAG, "클라이언트 처리 초기화 오류", e)
         } finally {
-            reader?.close()
-            client.close()
+            try {
+                reader?.close()
+                client.close()
+            } catch (e: Exception) {
+                Log.e(TAG, "클라이언트 종료 중 오류", e)
+            }
             Log.d(TAG, "클라이언트 연결 종료")
         }
     }
-
     private fun parseIncomingData(line: String) {
         try {
-            // JSON 데이터 형식 처리
+            // JSON 데이터 처리
             if (line.startsWith("{") && line.endsWith("}")) {
                 val json = JSONObject(line)
-                json.optDouble("speed", -1.0).takeIf { it >= 0 }?.let {
-                    Log.d(TAG, "Received speed: $it")   // <-- 나중에 삭제
-                    speedChannel.trySend(it.toFloat())
-                }
-                // 여기서 다른 데이터도 처리 가능 (졸음, 과속 등)
+                val obdData = ObdData(
+                    speed = json.optDouble("speed", -1.0).toFloat(),
+                    batterySOC = json.optDouble("batterySOC", -1.0).toFloat(),
+                    gear = json.optString("gear", ""),
+                    steering = json.optDouble("steering", 0.0).toFloat(),
+                    brake = json.optDouble("brake", 0.0).toFloat(),
+                    throttle = json.optDouble("throttle", 0.0).toFloat()
+                )
+                obdChannel.trySend(obdData)
             } else {
-                // 단순 숫자일 경우 속도로 처리
+                // 숫자만 들어오면 speed로 처리
                 line.toFloatOrNull()?.let { speed ->
                     if (speed >= 0) {
-                        Log.d(TAG, "Received speed: $speed")   // <-- 나중에 삭제
-                        speedChannel.trySend(speed)}
+                        obdChannel.trySend(
+                            ObdData(speed, -1f, "", 0f, 0f, 0f)
+                        )
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -180,12 +197,21 @@ class SocketService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         isRunning.set(false)
-        speedChannel.close()
+        obdChannel.close()
         dataProcessingJob?.cancel()
         serverJob?.cancel()
         scope.cancel()
         closeServer()
     }
+
+    data class ObdData(
+        val speed: Float,
+        val batterySOC: Float,
+        val gear: String,
+        val steering: Float,
+        val brake: Float,
+        val throttle: Float
+    )
 
     companion object {
         private const val TAG = "SocketService"

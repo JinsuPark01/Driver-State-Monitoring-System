@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#F5F5F5">
     <!-- 메인 영역 -->
@@ -287,13 +288,17 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginTop="16dp">
-
-            <!-- Camera Preview -->
-            <androidx.camera.view.PreviewView
-                android:id="@+id/viewFinder"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
+                android:layout_height="match_parent"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+                <!-- Camera Preview -->
+                <androidx.camera.view.PreviewView
+                    android:id="@+id/viewFinder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </androidx.cardview.widget.CardView>
             <!-- 가운데 표시 텍스트 -->
             <TextView
                 android:id="@+id/tvOverlay"

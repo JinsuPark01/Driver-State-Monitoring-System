@@ -23,9 +23,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.android_front.R
 import com.example.android_front.ai.ModelHandler
 import com.example.android_front.api.RetrofitInstance
-import com.example.android_front.api.TokenManager
 import com.example.android_front.model.WarningType
 import com.example.android_front.service.SocketService
+import com.example.android_front.service.SocketService.ObdData
 import com.example.android_front.websocket.WebSocketManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -33,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -62,18 +61,33 @@ class RunActivity : AppCompatActivity() {
     private lateinit var modelHandler: ModelHandler
 
     private var dispatchId: Long = -1
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    // ServiceConnection
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as SocketService.SocketBinder
             socketService = binder.getService()
             isBound = true
 
-            socketService?.setSpeedCallback { speed ->
-                runOnUiThread { tvCurrentSpeed.text = "${speed.toInt()} km/h" }
-                handleSpeedUpdate(speed.toDouble())
+            // OBD 전체 데이터 콜백
+            socketService?.setObdCallback { obdData ->
+                runOnUiThread {
+                    // UI에는 속도만 표시
+                    tvCurrentSpeed.text = "${obdData.speed.toInt()} km/h"
+                }
+
+                // 로그로 전체 OBD 정보 출력
+                Log.d("RunActivity", "OBD Data -> " +
+                        "Speed: ${obdData.speed}, " +
+                        "SOC: ${obdData.batterySOC}, " +
+                        "Gear: ${obdData.gear}, " +
+                        "Steering: ${obdData.steering}, " +
+                        "Brake: ${obdData.brake}, " +
+                        "Throttle: ${obdData.throttle}")
+
+                // 기존 속도 업데이트 처리
+                handleSpeedUpdate(obdData.speed.toDouble())
             }
         }
 
@@ -162,13 +176,13 @@ class RunActivity : AppCompatActivity() {
         }
 
         // 앱 시작 시 카메라 권한 체크
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        } else {
-            checkLocationPermissionAndStartCamera()
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//            != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+//        } else {
+//            checkLocationPermissionAndStartCamera()
+//        }
     }
 
     override fun onStart() {
@@ -181,7 +195,7 @@ class RunActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         if (isBound) {
-            socketService?.removeSpeedCallback()
+            socketService?.removeObdCallback()
             unbindService(connection)
             isBound = false
         }
@@ -241,7 +255,7 @@ class RunActivity : AppCompatActivity() {
     private fun setupEndButton() {
         val btnEnd = findViewById<TextView>(R.id.btnEnd)
         btnEnd.setOnClickListener {
-            socketService?.removeSpeedCallback()
+            socketService?.removeObdCallback()
             sendDrivingFinish()
         }
     }
@@ -267,7 +281,7 @@ class RunActivity : AppCompatActivity() {
 
     private fun sendWarning(type: WarningType) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-        val warningTime = LocalDateTime.now().format(formatter)  // ✅ LocalDateTime 사용
+        val warningTime = LocalDateTime.now().format(formatter)
         getCurrentLocation { lat, lon ->
             WebSocketManager.sendDriveEvent(dispatchId, type.name, warningTime, lat, lon)
             runOnUiThread {

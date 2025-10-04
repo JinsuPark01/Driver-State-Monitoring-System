@@ -9,7 +9,8 @@ import com.example.android_front.R
 import com.example.android_front.model.DispatchEventsResponse
 
 class DispatchEventAdapter(
-    private val eventList: List<DispatchEventsResponse>
+    private val eventList: List<DispatchEventsResponse>,
+    private val onItemClick: (DispatchEventsResponse) -> Unit // 클릭 콜백
 ) : RecyclerView.Adapter<DispatchEventAdapter.EventViewHolder>() {
 
     class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,12 +27,15 @@ class DispatchEventAdapter(
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event = eventList[position]
 
-        // 이벤트 종류 표시
         holder.tvEventType.text = event.eventType.warningName
+        holder.tvEventTime.text = event.eventTimestamp.substringAfter("T").substring(0, 5)
 
-        // 시간 단순 표시 (T 이후만)
-        holder.tvEventTime.text = event.eventTimestamp.substringAfter("T")
+        // 클릭 리스너
+        holder.itemView.setOnClickListener {
+            onItemClick(event)
+        }
     }
 
     override fun getItemCount(): Int = eventList.size
 }
+

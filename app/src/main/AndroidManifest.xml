@@ -47,6 +47,8 @@
         <activity android:name=".ui.RecordActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.MyPageActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.AllScoreActivity" android:exported="true" android:screenOrientation="portrait" />
+        <activity android:name=".test.KeyHashActivity" android:exported="true" android:screenOrientation="portrait" />
+
         <service
             android:name=".service.SocketService"
             android:enabled="true"

@@ -2,15 +2,23 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="8dp"
-    android:background="@drawable/bg_drive_card"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="4dp"
+    android:background="@drawable/bg_warning_card"
     android:layout_marginBottom="6dp">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvEventTime"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:text="23:41"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            />
         <!-- 알림 메시지 -->
         <TextView
             android:id="@+id/tvEventType"
@@ -19,17 +27,7 @@
             android:layout_weight="1"
             android:text="이상행동"
             android:textSize="14sp"
-            android:textStyle="bold"
+            android:textColor="@color/white"
             />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvEventTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="2025-09-28 23:41"
-        android:textSize="12sp"
-        android:textColor="@color/gray_light"
-        android:layout_marginTop="4dp"
-        />
 </LinearLayout>

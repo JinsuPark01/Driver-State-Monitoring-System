@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-//import com.bumptech.glide.Glide
 import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.api.RetrofitInstance

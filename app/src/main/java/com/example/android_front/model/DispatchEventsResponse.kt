@@ -7,10 +7,3 @@ data class DispatchEventsResponse(
     val latitude: Double?,
     val longitude: Double?,
 )
-
-
-//"drivingEventId": Long,
-//"eventType": DrivingEventType,
-//"eventTimestamp": LocalDateTime,
-//"latitude": Double,
-//"longitude": Double

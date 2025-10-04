@@ -91,4 +91,5 @@ dependencies {
 
     //카카오맵
     implementation("com.kakao.maps.open:android:2.12.18")
+    implementation("com.kakao.sdk:v2-common:2.13.0") // 해시키 추출용
 }

@@ -29,6 +29,16 @@
             android:layout_centerVertical="true"
             android:contentDescription="닫기"/>
     </RelativeLayout>
+    <TextView
+        android:id="@+id/tvNoNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="알림이 없습니다."
+        android:textSize="16sp"
+        android:textColor="@color/gray"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="16dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvNotifications"

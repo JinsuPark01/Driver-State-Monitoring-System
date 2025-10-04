@@ -18,13 +18,11 @@ import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.adapter.NotificationAdapter
 import com.example.android_front.adapter.ScoreAdapter
 import com.example.android_front.api.RetrofitInstance
-import com.example.android_front.api.TokenManager
 import com.example.android_front.model.DispatchResponse
 import com.example.android_front.model.DispatchStatus
 import com.example.android_front.model.NotificationResponse
 import com.example.android_front.model.UserDetailResponse
 import com.example.android_front.websocket.NotificationState
-import com.example.android_front.websocket.WebSocketManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         // LiveData 관찰하여 빨간 점 상태 반영
         NotificationState.hasNewNotification.observe(this, Observer { hasNew ->
             vRedDot.visibility = if (hasNew) View.VISIBLE else View.INVISIBLE
+
+            if (hasNew) { fetchDispatchList() } // 새로운 알림이 올 때마다 배차도 최신화
         })
 
         // 알람 버튼 클릭
@@ -178,8 +178,17 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful && response.body()?.success == true) {
                         val notifications: List<NotificationResponse> =
                             response.body()?.data ?: emptyList()
-                        val adapter = NotificationAdapter(notifications)
-                        rvNotifications.adapter = adapter
+                        val tvNoNotifications = view.findViewById<TextView>(R.id.tvNoNotifications)
+
+                        if (notifications.isEmpty()) {
+                            rvNotifications.visibility = View.GONE
+                            tvNoNotifications.visibility = View.VISIBLE
+                        } else {
+                            rvNotifications.visibility = View.VISIBLE
+                            tvNoNotifications.visibility = View.GONE
+                            val adapter = NotificationAdapter(notifications)
+                            rvNotifications.adapter = adapter
+                        }
 
                         // X 버튼 클릭 처리
                         val ivClose = view.findViewById<ImageView>(R.id.ivClosePopup)

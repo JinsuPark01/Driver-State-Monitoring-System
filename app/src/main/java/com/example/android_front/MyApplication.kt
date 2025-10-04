@@ -9,8 +9,14 @@ import ua.naiksoftware.stomp.dto.StompHeader
 
 class MyApplication : Application() {
 
+    companion object {
+        lateinit var context: MyApplication
+            private set
+    }
+
     override fun onCreate() {
         super.onCreate()
+        context = this
     }
 
     fun connectWebSocket(token: String) {

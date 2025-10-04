@@ -1,5 +1,9 @@
 package com.example.android_front.api
 
+import android.content.Context.MODE_PRIVATE
+import android.content.Intent
+import com.example.android_front.MyApplication
+import com.example.android_front.ui.LoginActivity
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -15,7 +19,23 @@ object RetrofitInstance {
         TokenManager.token?.let {
             requestBuilder.addHeader("Authorization", "Bearer $it")
         }
-        chain.proceed(requestBuilder.build())
+
+        val response = chain.proceed(requestBuilder.build())
+
+        // 인증 실패 처리
+        if (response.code == 401 || response.code == 403) {
+            TokenManager.token = null
+            MyApplication.context.getSharedPreferences("auth", MODE_PRIVATE)
+                .edit()
+                .remove("token")
+                .apply()
+
+            val intent = Intent(MyApplication.context, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            MyApplication.context.startActivity(intent)
+        }
+
+        response
     }
 
     private val client = OkHttpClient.Builder()
