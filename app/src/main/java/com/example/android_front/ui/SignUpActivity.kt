@@ -88,9 +88,9 @@ class SignUpActivity : AppCompatActivity() {
                 showSnackbar("아이디를 입력해주세요")
                 return false
             }
-            password.length < 6 -> {
+            password.length < 8 -> {
                 etPassword.backgroundTintList = ColorStateList.valueOf(Color.RED)
-                showSnackbar("비밀번호는 6자리 이상이어야 합니다")
+                showSnackbar("비밀번호는 8자리 이상이어야 합니다")
                 return false
             }
             password != passwordConfirm -> {
@@ -111,6 +111,11 @@ class SignUpActivity : AppCompatActivity() {
             phoneNumber.isEmpty() -> {
                 etPhoneNumber.backgroundTintList = ColorStateList.valueOf(Color.RED)
                 showSnackbar("전화번호를 입력해주세요")
+                return false
+            }
+            !phoneNumber.matches(Regex("^010-\\d{4}-\\d{4}$")) -> {
+                etPhoneNumber.backgroundTintList = ColorStateList.valueOf(Color.RED)
+                showSnackbar("전화번호 형식을 맞춰주세요 (예: 010-1234-5678)")
                 return false
             }
             licenseNumber.isEmpty() -> {
@@ -141,7 +146,8 @@ class SignUpActivity : AppCompatActivity() {
                         startActivity(Intent(this@SignUpActivity, LoginActivity::class.java))
                         finish()
                     } else {
-                        showSnackbar("회원가입 실패: ${response.code()}")
+                        val msg = response.body()?.message ?: "error: ${response.code()}"
+                        showSnackbar(msg)
                     }
                 }
             } catch (e: Exception) {
