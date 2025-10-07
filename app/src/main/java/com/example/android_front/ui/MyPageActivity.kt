@@ -186,7 +186,7 @@ class MyPageActivity : AppCompatActivity() {
                         }
                     )
                 }
-                DispatchStatus.CANCELLED -> {
+                DispatchStatus.CANCELED -> {
                     Toast.makeText(this, "취소된 배차입니다.", Toast.LENGTH_SHORT).show()
                 }
                 else -> {

@@ -19,17 +19,23 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.android_front.R
 import com.example.android_front.ai.ModelHandler
 import com.example.android_front.api.RetrofitInstance
+import com.example.android_front.model.LocationRequest
+import com.example.android_front.model.ObdRequest
+import com.example.android_front.model.ObdResponse
 import com.example.android_front.model.WarningType
 import com.example.android_front.service.SocketService
-import com.example.android_front.service.SocketService.ObdData
 import com.example.android_front.websocket.WebSocketManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
@@ -47,6 +53,8 @@ class RunActivity : AppCompatActivity() {
 
     private var socketService: SocketService? = null
     private var isBound = false
+    private var lastObdSentTime = 0L
+
 
     private val speedBuffer = mutableListOf<Pair<Long, Double>>()
     private var lastCheckedTime: Long = 0
@@ -58,65 +66,9 @@ class RunActivity : AppCompatActivity() {
 
     private lateinit var previewView: PreviewView
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var modelHandler: ModelHandler
 
     private var dispatchId: Long = -1
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    // ServiceConnection
-    private val connection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as SocketService.SocketBinder
-            socketService = binder.getService()
-            isBound = true
-
-            // OBD 전체 데이터 콜백
-            socketService?.setObdCallback { obdData ->
-                runOnUiThread {
-                    // UI에는 속도만 표시
-                    tvCurrentSpeed.text = "${obdData.speed.toInt()} km/h"
-                }
-
-                // 로그로 전체 OBD 정보 출력
-                Log.d("RunActivity", "OBD Data -> " +
-                        "Speed: ${obdData.speed}, " +
-                        "SOC: ${obdData.batterySOC}, " +
-                        "Gear: ${obdData.gear}, " +
-                        "Steering: ${obdData.steering}, " +
-                        "Brake: ${obdData.brake}, " +
-                        "Throttle: ${obdData.throttle}")
-
-                // 기존 속도 업데이트 처리
-                handleSpeedUpdate(obdData.speed.toDouble())
-            }
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            isBound = false
-            socketService = null
-        }
-    }
-
-    // 카메라 권한 요청
-    private val requestCameraPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                checkLocationPermissionAndStartCamera()
-            } else {
-                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
-
-    // 위치 권한 요청
-    private val requestLocationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                startCamera()
-            } else {
-                Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,7 +92,7 @@ class RunActivity : AppCompatActivity() {
 
         previewView = findViewById(R.id.viewFinder)
         cameraExecutor = Executors.newSingleThreadExecutor()
-        modelHandler = ModelHandler(this)
+        ModelHandler.init(this)
 
         val tvDate = findViewById<TextView>(R.id.tv_date)
         val tvDriverName = findViewById<TextView>(R.id.tv_driver_name)
@@ -176,14 +128,106 @@ class RunActivity : AppCompatActivity() {
         }
 
         // 앱 시작 시 카메라 권한 체크
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-//            != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-//        } else {
-//            checkLocationPermissionAndStartCamera()
-//        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            checkLocationPermissionAndStartCamera()
+        }
     }
+    // ServiceConnection
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as SocketService.SocketBinder
+            socketService = binder.getService()
+            isBound = true
+
+            // ✅ Flow 구독으로 변경 (콜백 제거)
+            // ✅ 최신 Lifecycle 안전 방식
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    socketService?.latestObdData
+                        ?.filterNotNull()
+                        ?.collectLatest { obdData ->
+                            // UI 업데이트
+                            tvCurrentSpeed.text = "${obdData.speed.toInt()} km/h"
+
+                            Log.d("RunActivity", "OBD Data -> " +
+                                    "Speed: ${obdData.speed}, " +
+                                    "SOC: ${obdData.batterySOC}, " +
+                                    "Gear: ${obdData.gear}, " +
+                                    "Steering: ${obdData.steering}, " +
+                                    "Brake: ${obdData.brake}, " +
+                                    "Throttle: ${obdData.throttle}")
+
+                            // 속도 변화 처리
+                            handleSpeedUpdate(obdData.speed.toDouble())
+
+                            // 서버 전송은 별도의 Flow로 1초마다
+                            sendPeriodicSocketData(obdData)
+                        }
+                }
+            }
+
+        }
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+            socketService = null
+        }
+    }
+
+    private fun sendPeriodicSocketData(obdData: ObdResponse) {
+        val now = System.currentTimeMillis()
+        if (now - lastObdSentTime >= 1000) { // 1초 단위 전송
+            lastObdSentTime = now
+
+            // Request 생성
+            val obdRequest = ObdRequest(
+                dispatchId = dispatchId,
+                speed = obdData.speed,
+                batterySOC = obdData.batterySOC,
+                brake = obdData.brake,
+                throttle = obdData.throttle,
+                clutch = obdData.clutch,
+                engineRpm = obdData.engineRpm,
+                engineStalled = obdData.engineStalled,
+                engineTorque = obdData.engineTorque
+            )
+
+            getCurrentLocation { lat, lon ->
+                val locationRequest = LocationRequest(
+                    dispatchId = dispatchId,
+                    latitude = lat,
+                    longitude = lon
+                )
+                WebSocketManager.sendLocationData(locationRequest)
+
+                // 전송
+                WebSocketManager.sendObdData(obdRequest)
+            }
+        }
+    }
+    // 카메라 권한 요청
+    private val requestCameraPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                checkLocationPermissionAndStartCamera()
+            } else {
+                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
+
+    // 위치 권한 요청
+    private val requestLocationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                startCamera()
+            } else {
+                Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onStart() {
         super.onStart()
@@ -195,7 +239,6 @@ class RunActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         if (isBound) {
-            socketService?.removeObdCallback()
             unbindService(connection)
             isBound = false
         }
@@ -216,17 +259,19 @@ class RunActivity : AppCompatActivity() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            cameraProvider.unbindAll()
 
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
+            val preview = Preview.Builder()
+                .build()
+                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
 
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor) { imageProxy ->
-                        modelHandler.analyzeImage(imageProxy) { result ->
+                .also { analysis ->
+                    analysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                        // 싱글톤이므로 ModelHandler 이름으로 접근
+                        ModelHandler.analyzeImage(imageProxy) { result ->
                             runOnUiThread {
                                 when (result) {
                                     "ABNORMAL" -> onAbnormalBehaviorDetected()
@@ -238,30 +283,25 @@ class RunActivity : AppCompatActivity() {
                     }
                 }
 
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    CameraSelector.DEFAULT_FRONT_CAMERA,
-                    preview,
-                    imageAnalyzer
-                )
-            } catch (exc: Exception) {
-                exc.printStackTrace()
-            }
+            cameraProvider.bindToLifecycle(
+                this,
+                CameraSelector.DEFAULT_FRONT_CAMERA,
+                preview,
+                imageAnalyzer
+            )
         }, ContextCompat.getMainExecutor(this))
     }
+
 
     private fun setupEndButton() {
         val btnEnd = findViewById<TextView>(R.id.btnEnd)
         btnEnd.setOnClickListener {
-            socketService?.removeObdCallback()
             sendDrivingFinish()
         }
     }
 
     /** 현재 위치 가져오기 */
-    private fun getCurrentLocation(onLocationReady: (Double, Double) -> Unit) {
+    private fun getCurrentLocation(onLocationReady: (Double?, Double?) -> Unit) {
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
@@ -271,7 +311,7 @@ class RunActivity : AppCompatActivity() {
                     onLocationReady(location.latitude, location.longitude)
                 } else {
                     Log.w("RunActivity", "위치를 가져오지 못했습니다 (null)")
-                    onLocationReady(0.0, 0.0)
+                    onLocationReady(null, null)
                 }
             }
         } else {
@@ -341,6 +381,12 @@ class RunActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@RunActivity, "운행 종료 처리 완료", Toast.LENGTH_SHORT).show()
+
+                        // ✅ OBD 소켓 종료 추가
+                        socketService?.disconnectAll()
+                        unbindService(connection)
+                        isBound = false
+
                         finish()
                     } else {
                         Toast.makeText(this@RunActivity, "운행 종료 실패", Toast.LENGTH_SHORT).show()
@@ -353,6 +399,7 @@ class RunActivity : AppCompatActivity() {
             }
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()

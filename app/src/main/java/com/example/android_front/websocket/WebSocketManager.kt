@@ -4,6 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.example.android_front.api.TokenManager
+import com.example.android_front.model.LocationRequest
+import com.example.android_front.model.ObdRequest
+import com.example.android_front.model.ObdResponse
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -58,7 +61,7 @@ object WebSocketManager {
         // ✅ Create STOMP client
         stompClient = Stomp.over(
             Stomp.ConnectionProvider.OKHTTP,
-            "ws://172.30.1.74:8080/ws-native",
+            "ws://192.168.0.34:8080/ws-native",
             null,
             okHttpClient
         )
@@ -164,6 +167,76 @@ object WebSocketManager {
         )
     }
 
+    fun sendObdData(obdData: ObdRequest) {
+        if (!::stompClient.isInitialized || !isConnected) {
+            Log.e(TAG, "STOMP not connected. OBD data dropped")
+            return
+        }
+
+        // payload 구성
+        val payload = mapOf(
+            "dispatchId" to obdData.dispatchId,
+            "stalled" to obdData.engineStalled,
+            "soc" to obdData.batterySOC,
+            "engineRpm" to obdData.engineRpm,
+            "torque" to obdData.engineTorque,
+            "brake" to obdData.brake,
+            "throttle" to obdData.throttle,
+            "clutch" to obdData.clutch
+        )
+
+        val json = gson.toJson(payload)
+
+        val headers = listOf(
+            StompHeader("destination", "/app/obd/update"),
+            StompHeader("Authorization", "Bearer ${TokenManager.token}")
+        )
+
+        val message = StompMessage(StompCommand.SEND, headers, json)
+
+        disposables.add(
+            stompClient.send(message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.d(TAG, "OBD data sent: $json")
+                }, { error ->
+                    Log.e(TAG, "OBD send error: ${error.message}")
+                })
+        )
+    }
+
+    fun sendLocationData(locationData: LocationRequest) {
+        if (!::stompClient.isInitialized || !isConnected) {
+            Log.e(TAG, "STOMP not connected. Location data dropped")
+            return
+        }
+
+        // payload 구성
+        val payload = mapOf(
+            "dispatchId" to locationData.dispatchId,
+            "latitude" to locationData.latitude,
+            "longitude" to locationData.longitude
+        )
+
+        val json = gson.toJson(payload)
+
+        val headers = listOf(
+            StompHeader("destination", "/app/location/update"),
+            StompHeader("Authorization", "Bearer ${TokenManager.token}")
+        )
+
+        val message = StompMessage(StompCommand.SEND, headers, json)
+
+        disposables.add(
+            stompClient.send(message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.d(TAG, "Location data sent: $json")
+                }, { error ->
+                    Log.e(TAG, "Location send error: ${error.message}")
+                })
+        )
+    }
 
     /**
      * 서버 메시지 구독

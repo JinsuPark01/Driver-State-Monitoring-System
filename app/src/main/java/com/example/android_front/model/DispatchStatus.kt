@@ -5,5 +5,5 @@ enum class DispatchStatus(val displayName: String) {
     RUNNING("운행중"),
     COMPLETED("완료"),
     DELAYED("지연"),
-    CANCELLED("취소")
+    CANCELED("취소")
 }

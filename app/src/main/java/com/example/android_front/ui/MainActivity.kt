@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
                     intent.putExtra("dispatchId", dispatch.dispatchId)
                     startActivity(intent)
                 }
-                DispatchStatus.CANCELLED -> {
+                DispatchStatus.CANCELED -> {
                     Toast.makeText(this, "취소된 배차입니다.", Toast.LENGTH_SHORT).show()
                 }
                 else -> {

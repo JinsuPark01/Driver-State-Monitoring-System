@@ -17,6 +17,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this
+        com.kakao.vectormap.KakaoMapSdk.init(this, "d9b7be427350a8ff6f7b040fe4ec032f")
     }
 
     fun connectWebSocket(token: String) {

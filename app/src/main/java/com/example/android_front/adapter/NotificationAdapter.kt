@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
 import com.example.android_front.model.NotificationResponse
+import com.example.android_front.model.NotificationType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -18,7 +19,7 @@ class NotificationAdapter(
         val tvDispatchDate: TextView = itemView.findViewById(R.id.tvDispatchDate)
         val tvIsRead: TextView = itemView.findViewById(R.id.tvNotificationIsRead)
         val tvCreatedAt: TextView = itemView.findViewById(R.id.tvNotificationCreatedAt)
-
+        val tvMessage: TextView = itemView.findViewById<TextView>(R.id.tvNotificationMessage)
 
     }
 
@@ -57,6 +58,12 @@ class NotificationAdapter(
         }
 
         holder.tvCreatedAt.text = item.createdAt?.substring(0,16)?.replace("T"," ") ?: ""
+
+        // ✅ notificationType에 따른 메시지 설정
+        holder.tvMessage.text = when(item.notificationType) {
+            NotificationType.NEW_DISPATCH_ASSIGNED -> "에 신규 배차 추가"
+            NotificationType.DISPATCH_CANCELED -> " 배차 취소"
+        }
     }
 }
 

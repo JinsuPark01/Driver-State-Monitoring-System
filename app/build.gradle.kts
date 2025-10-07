@@ -68,7 +68,7 @@ dependencies {
     // GPU delegate
     // implementation 'org.tensorflow:tensorflow-lite-gpu:2.13.0'
     // Support library (모델 입출력 편하게 처리)
-    // implementation 'org.tensorflow:tensorflow-lite-support:0.4.3'
+    implementation ("org.tensorflow:tensorflow-lite-support:0.4.3")
 
     // STOMP (WebSocket)
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
@@ -85,11 +85,9 @@ dependencies {
     //GPS
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
-    //파이토치 모바일 (Android 최신 안정 버전)
-    implementation("org.pytorch:pytorch_android:1.13.1")
-    implementation("org.pytorch:pytorch_android_torchvision:1.13.1")
-
     //카카오맵
     implementation("com.kakao.maps.open:android:2.12.18")
     implementation("com.kakao.sdk:v2-common:2.13.0") // 해시키 추출용
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
 }
