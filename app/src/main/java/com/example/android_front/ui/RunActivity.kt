@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,16 +47,25 @@ import java.util.concurrent.Executors
 class RunActivity : AppCompatActivity() {
 
     private lateinit var tvCurrentSpeed: TextView
+    private lateinit var tvGeer: TextView
+    private lateinit var tvHandle: TextView
+
     private lateinit var tvAcceleration: TextView
     private lateinit var tvBraking: TextView
     private lateinit var tvDrowsiness: TextView
     private lateinit var tvAbnormal: TextView
 
+    private lateinit var tvStatusDrowsiness: TextView
+    private lateinit var tvStatusCigarette: TextView
+    private lateinit var tvStatusPhone: TextView
+    private lateinit var tvStatusSeatbelt: TextView
+    private lateinit var tvOverlay: TextView
+
     private var socketService: SocketService? = null
     private var isBound = false
     private var lastObdSentTime = 0L
 
-
+    private val lastWarningSentTime = mutableMapOf<WarningType, Long>()
     private val speedBuffer = mutableListOf<Pair<Long, Double>>()
     private var lastCheckedTime: Long = 0
 
@@ -85,10 +95,19 @@ class RunActivity : AppCompatActivity() {
         }
 
         tvCurrentSpeed = findViewById(R.id.tv_current_speed)
+        tvGeer = findViewById(R.id.tv_geer)
+        tvHandle = findViewById(R.id.tv_steer)
+
         tvAcceleration = findViewById(R.id.tv_over_speed)
         tvBraking = findViewById(R.id.tv_under_speed)
         tvDrowsiness = findViewById(R.id.tv_sleep)
         tvAbnormal = findViewById(R.id.tv_abnormal)
+
+        tvStatusDrowsiness = findViewById(R.id.tvStatusDrowsiness)
+        tvStatusCigarette = findViewById(R.id.tvStatusCigarette)
+        tvStatusPhone = findViewById(R.id.tvStatusPhone)
+        tvStatusSeatbelt = findViewById(R.id.tvStatusSeatbelt)
+        tvOverlay = findViewById(R.id.tvOverlay)
 
         previewView = findViewById(R.id.viewFinder)
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -105,13 +124,13 @@ class RunActivity : AppCompatActivity() {
         // 위치 클라이언트 초기화
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // 테스트 버튼 이벤트
+        // 테스트 버튼 이벤트 -> 추후 삭제
         tvAbnormal.setOnClickListener {
-            onAbnormalBehaviorDetected()
+            onDrowsinessOrAbnormalBehaviorDetected(listOf("cigarette", "phone"))
             Toast.makeText(this, "테스트: 이상행동 이벤트 발생", Toast.LENGTH_SHORT).show()
         }
         tvDrowsiness.setOnClickListener {
-            onDrowsinessDetected()
+            onDrowsinessOrAbnormalBehaviorDetected(listOf("DROWSINESS"))
             Toast.makeText(this, "테스트: 졸음감지 이벤트 발생", Toast.LENGTH_SHORT).show()
         }
         tvAcceleration.setOnClickListener {
@@ -152,6 +171,8 @@ class RunActivity : AppCompatActivity() {
                         ?.collectLatest { obdData ->
                             // UI 업데이트
                             tvCurrentSpeed.text = "${obdData.speed.toInt()} km/h"
+                            tvGeer.text = "${obdData.gear}"
+                            tvHandle.text = "${obdData.steering.toInt()}°"
 
                             Log.d("RunActivity", "OBD Data -> " +
                                     "Speed: ${obdData.speed}, " +
@@ -270,14 +291,22 @@ class RunActivity : AppCompatActivity() {
                 .build()
                 .also { analysis ->
                     analysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                        // 싱글톤이므로 ModelHandler 이름으로 접근
-                        ModelHandler.analyzeImage(imageProxy) { result ->
+                        ModelHandler.analyzeImage(imageProxy) { results ->
                             runOnUiThread {
-                                when (result) {
-                                    "ABNORMAL" -> onAbnormalBehaviorDetected()
-                                    "DROWSINESS" -> onDrowsinessDetected()
-                                    else -> { /* NORMAL */ }
+
+                                runOnUiThread {
+                                    // abnormalLabels가 비어있으면 정상, 값이 있으면 이상
+                                    onDrowsinessOrAbnormalBehaviorDetected(results)
                                 }
+//                                어짜피 항상 함수 실행
+//                                results.forEach { result ->
+//                                    when (result) {
+//                                        "cigarette" -> onAbnormalBehaviorDetected()
+//                                        "phone" -> onAbnormalBehaviorDetected()
+//                                        "noseatbelt" -> onAbnormalBehaviorDetected()
+//                                        "DROWSINESS" -> onDrowsinessDetected()
+//                                    }
+//                                }
                             }
                         }
                     }
@@ -320,12 +349,42 @@ class RunActivity : AppCompatActivity() {
     }
 
     private fun sendWarning(type: WarningType) {
+        val now = System.currentTimeMillis()
+        val lastSent = lastWarningSentTime[type] ?: 0L
+
+        // 🔹 마지막 전송 후 10초 미만이면 무시
+        if (now - lastSent < 10_000) return
+
+        // 🔹 전송 시간 갱신
+        lastWarningSentTime[type] = now
+
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val warningTime = LocalDateTime.now().format(formatter)
+
         getCurrentLocation { lat, lon ->
             WebSocketManager.sendDriveEvent(dispatchId, type.name, warningTime, lat, lon)
             runOnUiThread {
                 Toast.makeText(this, "${type.name} 이벤트 전송됨", Toast.LENGTH_SHORT).show()
+
+                // ✅ 타입별 UI 업데이트 틀
+                when (type) {
+                    WarningType.ACCELERATION -> {
+                        accelerationCount++
+                        tvAcceleration.text = "${accelerationCount}회"
+                    }
+                    WarningType.BRAKING -> {
+                        brakingCount++
+                        tvBraking.text = "${brakingCount}회"
+                    }
+                    WarningType.DROWSINESS -> {
+                        drowsinessCount++
+                        tvDrowsiness.text = "${drowsinessCount}회"
+                    }
+                    WarningType.ABNORMAL -> {
+                        abnormalCount++
+                        tvAbnormal.text = "${abnormalCount}회"
+                    }
+                }
             }
         }
     }
@@ -347,13 +406,9 @@ class RunActivity : AppCompatActivity() {
                     val rate = deltaV / deltaT
                     when {
                         rate >= 15.0 -> {
-                            accelerationCount++
-                            tvAcceleration.text = "${accelerationCount}회"
                             sendWarning(WarningType.ACCELERATION)
                         }
                         rate <= -15.0 -> {
-                            brakingCount++
-                            tvBraking.text = "${brakingCount}회"
                             sendWarning(WarningType.BRAKING)
                         }
                     }
@@ -362,17 +417,43 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
-    private fun onDrowsinessDetected() {
-        drowsinessCount++
-        tvDrowsiness.text = "${drowsinessCount}회"
-        sendWarning(WarningType.DROWSINESS)
+    private fun onDrowsinessOrAbnormalBehaviorDetected(abnormalLabels: List<String>) {
+        // UI 상태 업데이트
+        tvStatusDrowsiness.text = if (abnormalLabels.contains("DROWSINESS")) "비정상" else "정상"
+        tvStatusCigarette.text = if (abnormalLabels.contains("cigarette")) "비정상" else "정상"
+        tvStatusPhone.text = if (abnormalLabels.contains("phone")) "비정상" else "정상"
+        tvStatusSeatbelt.text = if (abnormalLabels.contains("noseatbelt")) "비정상" else "정상"
+
+        // tvOverlay 업데이트
+        if (abnormalLabels.isNotEmpty()) {
+            if (tvOverlay.visibility != View.VISIBLE) {
+                tvOverlay.visibility = View.VISIBLE
+                tvOverlay.alpha = 0f
+                tvOverlay.animate()
+                    .alpha(1f)
+                    .setDuration(500)
+                    .setListener(null)
+            }
+        } else {
+            if (tvOverlay.visibility == View.VISIBLE) {
+                tvOverlay.animate()
+                    .alpha(0f)
+                    .setDuration(500)
+                    .withEndAction {
+                        tvOverlay.visibility = View.GONE
+                    }
+            }
+        }
+
+        // 경고 전송
+        if (abnormalLabels.contains("DROWSINESS")) {
+            sendWarning(WarningType.DROWSINESS)
+        }
+        if (abnormalLabels.any { it == "cigarette" || it == "phone" || it == "noseatbelt" }) {
+            sendWarning(WarningType.ABNORMAL)
+        }
     }
 
-    private fun onAbnormalBehaviorDetected() {
-        abnormalCount++
-        tvAbnormal.text = "${abnormalCount}회"
-        sendWarning(WarningType.ABNORMAL)
-    }
 
     private fun sendDrivingFinish() {
         lifecycleScope.launch(Dispatchers.IO) {

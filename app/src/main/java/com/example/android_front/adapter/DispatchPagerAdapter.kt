@@ -66,10 +66,10 @@ class DispatchPagerAdapter(
 
             // next_action 업데이트
             holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when (item.status) {
-                DispatchStatus.SCHEDULED -> "운행 시작 →"
-                DispatchStatus.COMPLETED -> "결과 확인 →"
-                DispatchStatus.CANCELED -> "취소됨"
-                else -> "운행중"
+                DispatchStatus.SCHEDULED -> "운행 시작"
+                DispatchStatus.COMPLETED -> "결과 확인"
+                DispatchStatus.CANCELED -> "취소 배차"
+                else -> "운행 중"
             }
         } else if (holder is EmptyViewHolder) {
             holder.tvNoDispatch.text = "배차 일정이 없습니다"

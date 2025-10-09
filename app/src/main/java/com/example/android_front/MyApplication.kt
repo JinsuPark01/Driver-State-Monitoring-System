@@ -2,10 +2,11 @@ package com.example.android_front
 
 import android.app.Application
 import android.util.Log
-import com.example.android_front.api.TokenManager
 import com.example.android_front.websocket.NotificationState
 import com.example.android_front.websocket.WebSocketManager
 import ua.naiksoftware.stomp.dto.StompHeader
+import java.io.FileInputStream
+import java.util.Properties
 
 class MyApplication : Application() {
 
@@ -17,6 +18,10 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this
+//        val props = Properties().apply {
+//            load(FileInputStream(filesDir.parent + "/local.properties"))
+//        }
+//        val kakaoKey = props.getProperty("KAKAO_MAP_KEY")
         com.kakao.vectormap.KakaoMapSdk.init(this, "d9b7be427350a8ff6f7b040fe4ec032f")
     }
 

@@ -96,17 +96,17 @@
                 android:layout_marginBottom="16dp"
                 android:background="#DDDDDD" />
 
-            <!-- 하단: 속도 및 이동거리 -->
+            <!-- 하단: 속도 및 기어, 핸들 각도 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="2">
+                android:weightSum="4">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -138,25 +138,51 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:layout_gravity="bottom"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tv_drivingScore"
+                        android:id="@+id/tv_geer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100점"
+                        android:text="N"
                         android:textColor="@color/black"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="운전점수"
+                        android:text="기어"
                         android:textColor="@color/gray"
                         android:textSize="14sp" />
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="bottom"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_steer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100°"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="핸들각"
+                        android:textColor="@color/gray"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 
@@ -302,15 +328,117 @@
             <!-- 가운데 표시 텍스트 -->
             <TextView
                 android:id="@+id/tvOverlay"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="졸음 운전 감지!"
+                android:text="경고!"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
                 android:layout_gravity="center"
-                android:background="#66000000"
+                android:background="#60FF0000"
                 android:padding="8dp"
+                android:gravity="center"
                 android:visibility="gone"/>
+            <LinearLayout
+                android:id="@+id/statusOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:layout_gravity="top|end"
+                android:background="#40000000">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvLabelDrowsiness"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="졸음 :"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/tvStatusDrowsiness"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="정상"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:paddingStart="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvLabelCigarette"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="담배 :"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/tvStatusCigarette"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="비정상"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:paddingStart="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvLabelPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="전화 :"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/tvStatusPhone"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="정상"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:paddingStart="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvLabelSeatbelt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="벨트 :"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/tvStatusSeatbelt"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="정상"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:paddingStart="4dp"/>
+                </LinearLayout>
+            </LinearLayout>
 
         </FrameLayout>
 

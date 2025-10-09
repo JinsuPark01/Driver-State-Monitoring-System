@@ -85,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val body = response.body()
                         if (body != null && body.success && body.data != null) {
-                            val token = body.data.token
+                            val token = body.data.accessToken
                             TokenManager.token = token // 인터셉터용
                             getSharedPreferences("auth", MODE_PRIVATE)
                                 .edit()
