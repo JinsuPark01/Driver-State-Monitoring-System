@@ -6,11 +6,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.api.RetrofitInstance
-import com.example.android_front.model.DispatchResponse
+import com.example.android_front.model.DispatchDetailResponse
 import com.example.android_front.model.DispatchStatus
 import com.example.android_front.model.UserDetailResponse
 import kotlinx.coroutines.CoroutineScope
@@ -147,7 +148,7 @@ class MyPageActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         val apiBody = response.body()
-                        val dispatchList: List<DispatchResponse> = apiBody?.data ?: emptyList()
+                        val dispatchList: List<DispatchDetailResponse> = apiBody?.data ?: emptyList()
                         setupViewPager(dispatchList)
                     } else {
                         Toast.makeText(
@@ -169,7 +170,7 @@ class MyPageActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupViewPager(dispatchList: List<DispatchResponse>) {
+    private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
                 DispatchStatus.SCHEDULED -> {
@@ -196,6 +197,13 @@ class MyPageActivity : AppCompatActivity() {
         }
 
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        /** ← 여기부터 Peek 관련 설정 추가 */
+        viewPager.clipToPadding = false
+        viewPager.clipChildren = false
+        (viewPager.getChildAt(0) as RecyclerView).clipToPadding = false
+        (viewPager.getChildAt(0) as RecyclerView).clipChildren = false
+        viewPager.offscreenPageLimit = 3
+        /** ← 여기까지 */
         setupIndicators(dispatchList.size)
         setCurrentIndicator(0)
 

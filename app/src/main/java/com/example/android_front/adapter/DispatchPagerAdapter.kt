@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
-import com.example.android_front.model.DispatchResponse
+import com.example.android_front.model.DispatchDetailResponse
 import com.example.android_front.model.DispatchStatus
 
 class DispatchPagerAdapter(
-    private val items: List<DispatchResponse>,
-    private val onItemClick: (DispatchResponse) -> Unit
+    private val items: List<DispatchDetailResponse>,
+    private val onItemClick: (DispatchDetailResponse) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -20,7 +20,7 @@ class DispatchPagerAdapter(
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvDriverName: TextView = view.findViewById(R.id.tvDriverName)
+        val tvVehicleNumber: TextView = view.findViewById(R.id.tvVehicleNumber)
         val tvRouteNumber: TextView = view.findViewById(R.id.tvRouteNumber)
         val tvDepartureTime: TextView = view.findViewById(R.id.tvDepartureTime)
         val tvDriveStatus: TextView = view.findViewById(R.id.tvDriveStatus)
@@ -59,10 +59,10 @@ class DispatchPagerAdapter(
         if (holder is ViewHolder) {
             val item = items[position]
 
-            holder.tvDriverName.text = ":  ${item.driverName ?: "알 수 없음"}"
-            holder.tvRouteNumber.text = ":  ${item.routeNumber ?: "-"}"
-            holder.tvDepartureTime.text = ":  ${item.scheduledDepartureTime.substringAfter("T")}"
-            holder.tvDriveStatus.text = ":  ${item.status.displayName ?: "-"}"
+            holder.tvVehicleNumber.text = "  (${item.vehicleNumber ?: "알 수 없음"})"
+            holder.tvRouteNumber.text = "${item.routeNumber ?: "-"}번"
+            holder.tvDepartureTime.text = "${item.dispatchDate.replace("-", ".")} | ${item.scheduledDepartureTime.substringAfter("T").substring(0, 5)} ~ ${item.scheduledArrivalTime.substringAfter("T").substring(0, 5)}"
+            holder.tvDriveStatus.text = "${item.status.displayName ?: "-"}"
 
             // next_action 업데이트
             holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when (item.status) {

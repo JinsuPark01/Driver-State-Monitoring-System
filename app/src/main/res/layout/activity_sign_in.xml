@@ -7,12 +7,39 @@
     android:fitsSystemWindows="true"
     android:background="@android:color/white">
     <ImageView
-        android:id="@+id/icDeco"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/ic_deco"
+        android:src="@drawable/ic_green_circle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.94"
+        app:layout_constraintVertical_bias="0.12"
+        app:tint="#4C7DCC"/>
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_green_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.13"
+        app:layout_constraintVertical_bias="0.02"
+        app:tint="#555cc1"/>
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_green_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.77"
+        app:layout_constraintVertical_bias="0.18"
+        app:tint="#449fd5"/>
+
 
     <LinearLayout
         android:id="@+id/header_container"
@@ -118,6 +145,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginEnd="24dp"
         android:background="@drawable/bg_input_field"
+
         android:hint="비밀번호 입력"
         android:inputType="textPassword"
         android:paddingStart="16dp"

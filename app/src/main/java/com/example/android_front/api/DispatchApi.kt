@@ -4,7 +4,6 @@ import com.example.android_front.model.ApiResponse
 import com.example.android_front.model.DispatchDetailResponse
 import com.example.android_front.model.DispatchEventsResponse
 import com.example.android_front.model.DispatchRecordResponse
-import com.example.android_front.model.DispatchResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -17,7 +16,7 @@ interface DispatchApi {
     suspend fun getDispatchList(
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String
-    ): Response<ApiResponse<List<DispatchResponse>>>
+    ): Response<ApiResponse<List<DispatchDetailResponse>>>
 
     @GET("/api/driver/me/dispatches/{dispatchId}")
     suspend fun getDispatchDetail(

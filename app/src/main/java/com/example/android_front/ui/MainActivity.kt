@@ -18,7 +18,6 @@ import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.adapter.NotificationAdapter
 import com.example.android_front.adapter.ScoreAdapter
 import com.example.android_front.api.RetrofitInstance
-import com.example.android_front.model.DispatchResponse
 import com.example.android_front.model.DispatchStatus
 import com.example.android_front.model.NotificationResponse
 import com.example.android_front.model.UserDetailResponse
@@ -29,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.Observer
+import com.example.android_front.model.DispatchDetailResponse
 
 class MainActivity : AppCompatActivity() {
 
@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** ViewPager2 세팅 */
-    private fun setupViewPager(dispatchList: List<DispatchResponse>) {
+    private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
                 DispatchStatus.SCHEDULED -> {
@@ -262,6 +262,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        /** ← 여기부터 Peek 관련 설정 추가 */
+        viewPager.clipToPadding = false
+        viewPager.clipChildren = false
+        (viewPager.getChildAt(0) as RecyclerView).clipToPadding = false
+        (viewPager.getChildAt(0) as RecyclerView).clipChildren = false
+        viewPager.offscreenPageLimit = 3
+        /** ← 여기까지 */
         setupIndicators(dispatchList.size)
         setCurrentIndicator(0)
 
