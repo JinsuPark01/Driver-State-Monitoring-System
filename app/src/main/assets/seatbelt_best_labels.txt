@@ -1,0 +1,4 @@
+seatbelt
+person-noseatbelt
+person-seatbelt
+windshield

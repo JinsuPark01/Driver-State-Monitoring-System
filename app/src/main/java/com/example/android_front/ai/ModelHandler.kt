@@ -42,14 +42,19 @@ object ModelHandler {
     fun init(context: Context) {
         if (initialized) return
         try {
+            //시가 모델
             loadModel(context, ModelType.CIGARETTE, "cigarette_best_float16.tflite", "cigarette_best_labels.txt")
+            //휴대폰 모델
+            loadModel(context, ModelType.PHONE, "phone_float16.tflite", "phone_labels.txt")
+            //안전벨트 모델
+            loadModel(context, ModelType.SEATBELT, "seatbelt_best_float16.tflite", "seatbelt_best_labels.txt")
+
             initialized = true
             Log.d("ModelHandler", "✅ All models initialized successfully")
         } catch (e: Exception) {
             Log.e("ModelHandler", "❌ Model initialization failed: ${e.message}")
         }
     }
-
     // -----------------------------------------------------
     // 🔹 모델 로드 함수
     // -----------------------------------------------------
@@ -137,13 +142,25 @@ object ModelHandler {
     // -----------------------------------------------------
     // 🔹 실제 분석 함수 (CameraX용)
     // -----------------------------------------------------
-    fun analyzeImage(imageProxy: ImageProxy, callback: (String) -> Unit) {
+    fun analyzeImage(imageProxy: ImageProxy, callback: (List<String>) -> Unit) {
         val bitmap = imageProxy.toBitmap()
-        val results = runModel(bitmap)
 
-        val abnormalDetected = results.any { it.label.lowercase() == "cigarette" }
-        callback(if (abnormalDetected) "ABNORMAL" else "NORMAL")
+        val cigaretteResults = runModel(bitmap, ModelType.CIGARETTE)
+        val phoneResults = runModel(bitmap, ModelType.PHONE)
+        val seatbeltResults = runModel(bitmap, ModelType.SEATBELT)
 
+        val detectedEvents = mutableListOf<String>()
+
+        if (cigaretteResults.any { it.label.lowercase() == "cigarette" })
+            detectedEvents.add("cigarette")
+
+        if (phoneResults.any { it.label.lowercase() == "phone" })
+            detectedEvents.add("phone")
+
+        if (seatbeltResults.any { it.label.lowercase() == "person-noseatbelt" })
+            detectedEvents.add("noseatbelt")
+
+        callback(detectedEvents)
         imageProxy.close()
     }
 

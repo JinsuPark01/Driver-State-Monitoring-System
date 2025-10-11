@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -31,6 +32,7 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var tvDate: TextView
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
+    private lateinit var tvNoDispatchMessage: TextView
 
     private var currentDate: LocalDate = LocalDate.now().minusDays(1) // 기본: 어제
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -48,6 +50,7 @@ class MyPageActivity : AppCompatActivity() {
         tvDate = findViewById(R.id.tv_date)
         viewPager = findViewById(R.id.viewPager)
         indicatorLayout = findViewById(R.id.indicator_layout)
+        tvNoDispatchMessage = findViewById(R.id.tvNoDispatch)
 
         // 뒤로가기
         btnBack.setOnClickListener { finish() }
@@ -149,6 +152,7 @@ class MyPageActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val apiBody = response.body()
                         val dispatchList: List<DispatchDetailResponse> = apiBody?.data ?: emptyList()
+                        tvNoDispatchMessage.visibility = View.GONE
                         setupViewPager(dispatchList)
                     } else {
                         Toast.makeText(
@@ -160,6 +164,7 @@ class MyPageActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    tvNoDispatchMessage.visibility = View.VISIBLE
                     Toast.makeText(
                         this@MyPageActivity,
                         "네트워크 오류: ${e.message}",
@@ -173,12 +178,31 @@ class MyPageActivity : AppCompatActivity() {
     private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
+                //                DispatchStatus.SCHEDULED -> {
+//                    AlertDialog.Builder(this)
+//                        .setTitle("운행 시작")
+//                        .setMessage("운행을 시작하시겠습니까?")
+//                        .setPositiveButton("확인") { _, _ ->
+//                            startDispatch(dispatch.dispatchId, dispatch.driverName, dispatch.dispatchDate)
+//                        }
+//                        .setNegativeButton("취소", null)
+//                        .show()
+//                }
+                //테스트용
                 DispatchStatus.SCHEDULED -> {
-                    startActivity(
-                        Intent(this, StartActivity::class.java).apply {
-                            putExtra("dispatchId", dispatch.dispatchId)
+                    AlertDialog.Builder(this)
+                        .setTitle("운행 시작")
+                        .setMessage("운행을 시작하시겠습니까?")
+                        .setPositiveButton("확인") { _, _ ->
+                            val intent = Intent(this, RunActivity::class.java).apply {
+                                putExtra("dispatchId", dispatch.dispatchId)
+                                putExtra("driverName", dispatch.driverName)
+                                putExtra("dispatchDate", dispatch.dispatchDate)
+                            }
+                            startActivity(intent)
                         }
-                    )
+                        .setNegativeButton("취소", null)
+                        .show()
                 }
                 DispatchStatus.COMPLETED -> {
                     startActivity(
@@ -214,11 +238,17 @@ class MyPageActivity : AppCompatActivity() {
         })
     }
 
+    /** 인디케이터 세팅 */
     private fun setupIndicators(count: Int) {
         indicatorLayout.removeAllViews()
-        val indicators = Array(count) { View(this) }
+
+        // 🔹 count가 0이면 최소 1개는 생성 (레이아웃 유지용)
+        val safeCount = if (count == 0) 1 else count
+
+        val indicators = Array(safeCount) { View(this) }
         val params = LinearLayout.LayoutParams(16, 16)
         params.setMargins(8, 0, 8, 0)
+
         for (i in indicators.indices) {
             indicators[i] = View(this).apply {
                 setBackgroundResource(R.drawable.indicator_unselected)
@@ -228,13 +258,58 @@ class MyPageActivity : AppCompatActivity() {
         }
     }
 
+    /** 현재 인디케이터 설정 */
     private fun setCurrentIndicator(index: Int) {
-        for (i in 0 until indicatorLayout.childCount) {
+        val count = indicatorLayout.childCount
+        if (count == 0) return  // 인디케이터가 없을 때 예외 방지
+
+        // 🔹 index가 범위를 벗어나지 않도록 조정
+        val safeIndex = index.coerceIn(0, count - 1)
+
+        for (i in 0 until count) {
             val view = indicatorLayout.getChildAt(i)
-            if (i == index) {
-                view.setBackgroundResource(R.drawable.indicator_selected)
-            } else {
-                view.setBackgroundResource(R.drawable.indicator_unselected)
+            view.setBackgroundResource(
+                if (i == safeIndex) R.drawable.indicator_selected
+                else R.drawable.indicator_unselected
+            )
+        }
+    }
+
+    private fun startDispatch(dispatchId: Long, driverName: String?, dispatchDate: String?) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.dispatchApi.updateDispatchStart(dispatchId)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null && body.success && body.data != null) {
+                            // ✅ 시작 성공 → RunActivity로 이동
+                            val intent = Intent(this@MyPageActivity, RunActivity::class.java).apply {
+                                putExtra("dispatchId", dispatchId)
+                                putExtra("driverName", driverName)
+                                putExtra("dispatchDate", dispatchDate)
+                            }
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this@MyPageActivity,
+                                body?.message ?: "운행 시작 실패",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(this@MyPageActivity, "운행 시작 실패", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MyPageActivity,
+                        "네트워크 오류: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

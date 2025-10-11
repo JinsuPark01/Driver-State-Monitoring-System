@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rvDrivingScores: RecyclerView
     private lateinit var scoreAdapter: ScoreAdapter
     private lateinit var vRedDot: View
+    private lateinit var tvNoDispatchMessage: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         rvDrivingScores = findViewById(R.id.rvDrivingScores)
         ivAlarm = findViewById(R.id.iv_alarm)
         vRedDot = findViewById(R.id.iv_newAlarm)
+        tvNoDispatchMessage = findViewById(R.id.tvNoDispatch)
 
         // LiveData 관찰하여 빨간 점 상태 반영
         NotificationState.hasNewNotification.observe(this, Observer { hasNew ->
@@ -134,6 +137,7 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val body = response.body()
                         if (body?.success == true && body.data != null) {
+                            tvNoDispatchMessage.visibility = View.GONE
                             setupViewPager(body.data)
                         } else {
                             Toast.makeText(
@@ -152,6 +156,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    tvNoDispatchMessage.visibility = View.VISIBLE
                     Toast.makeText(
                         this@MainActivity,
                         "네트워크 오류: ${e.message}",
@@ -239,10 +244,31 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
+//                DispatchStatus.SCHEDULED -> {
+//                    AlertDialog.Builder(this)
+//                        .setTitle("운행 시작")
+//                        .setMessage("운행을 시작하시겠습니까?")
+//                        .setPositiveButton("확인") { _, _ ->
+//                            startDispatch(dispatch.dispatchId, dispatch.driverName, dispatch.dispatchDate)
+//                        }
+//                        .setNegativeButton("취소", null)
+//                        .show()
+//                }
+                //테스트용
                 DispatchStatus.SCHEDULED -> {
-                    val intent = Intent(this, StartActivity::class.java)
-                    intent.putExtra("dispatchId", dispatch.dispatchId)
-                    startActivity(intent)
+                    AlertDialog.Builder(this)
+                        .setTitle("운행 시작")
+                        .setMessage("운행을 시작하시겠습니까?")
+                        .setPositiveButton("확인") { _, _ ->
+                            val intent = Intent(this, RunActivity::class.java).apply {
+                                putExtra("dispatchId", dispatch.dispatchId)
+                                putExtra("driverName", dispatch.driverName)
+                                putExtra("dispatchDate", dispatch.dispatchDate)
+                            }
+                            startActivity(intent)
+                        }
+                        .setNegativeButton("취소", null)
+                        .show()
                 }
                 DispatchStatus.COMPLETED -> {
                     val intent = Intent(this, RecordActivity::class.java)
@@ -282,9 +308,14 @@ class MainActivity : AppCompatActivity() {
     /** 인디케이터 세팅 */
     private fun setupIndicators(count: Int) {
         indicatorLayout.removeAllViews()
-        val indicators = Array(count) { View(this) }
+
+        // 🔹 count가 0이면 최소 1개는 생성 (레이아웃 유지용)
+        val safeCount = if (count == 0) 1 else count
+
+        val indicators = Array(safeCount) { View(this) }
         val params = LinearLayout.LayoutParams(16, 16)
         params.setMargins(8, 0, 8, 0)
+
         for (i in indicators.indices) {
             indicators[i] = View(this).apply {
                 setBackgroundResource(R.drawable.indicator_unselected)
@@ -294,15 +325,62 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** 현재 인디케이터 설정 */
     private fun setCurrentIndicator(index: Int) {
-        for (i in 0 until indicatorLayout.childCount) {
+        val count = indicatorLayout.childCount
+        if (count == 0) return  // 인디케이터가 없을 때 예외 방지
+
+        // 🔹 index가 범위를 벗어나지 않도록 조정
+        val safeIndex = index.coerceIn(0, count - 1)
+
+        for (i in 0 until count) {
             val view = indicatorLayout.getChildAt(i)
             view.setBackgroundResource(
-                if (i == index) R.drawable.indicator_selected
+                if (i == safeIndex) R.drawable.indicator_selected
                 else R.drawable.indicator_unselected
             )
         }
     }
+
+    private fun startDispatch(dispatchId: Long, driverName: String?, dispatchDate: String?) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.dispatchApi.updateDispatchStart(dispatchId)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null && body.success && body.data != null) {
+                            // ✅ 시작 성공 → RunActivity로 이동
+                            val intent = Intent(this@MainActivity, RunActivity::class.java).apply {
+                                putExtra("dispatchId", dispatchId)
+                                putExtra("driverName", driverName)
+                                putExtra("dispatchDate", dispatchDate)
+                            }
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity,
+                                body?.message ?: "운행 시작 실패",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(this@MainActivity, "운행 시작 실패", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "네트워크 오류: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()

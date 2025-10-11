@@ -64,19 +64,46 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingVertical="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="12dp"
             >
-
-            <!-- 배차 일지 영역 -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- warn -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="금일 배차 현황"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="12dp" />
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:paddingHorizontal="16dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="금일 배차 현황"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+                <LinearLayout
+                    android:id="@+id/tvDispatchError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="2dp"
+                        android:text="배차 문의"
+                        android:textSize="14sp"
+                        android:textColor="@color/white" />
+                    <ImageView
+                        android:layout_width="19dp"
+                        android:layout_height="19dp"
+                        android:src="@drawable/ic_warn"
+                        app:tint="@color/white"/>
+                </LinearLayout>
+            </LinearLayout>
+            <!-- 배차 일지 영역 -->
+
 
             <!-- ViewPager2 -->
             <androidx.viewpager2.widget.ViewPager2
@@ -88,6 +115,18 @@
                 android:overScrollMode="never"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"/>
+            <TextView
+                android:id="@+id/tvNoDispatch"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:text="배차 조회에 실패하였습니다"
+                android:textSize="20sp"
+                android:textColor="#888888"
+                android:gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_drive_card"
+                android:visibility="gone"/>
 
             <!-- 인디케이터 -->
             <LinearLayout
@@ -96,7 +135,36 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="10dp" />
+            <!-- 설정 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="22dp"
+                android:layout_marginTop="8dp" >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_timer" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="출발 전 알림을 받아보세요!"
+                    android:textSize="14sp" />
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_back_arrow"
+                    android:scaleX="-1"
+                    app:tint="@color/gray_light"/>
+            </LinearLayout>
         </LinearLayout>
         <!-- 메뉴 -->
         <LinearLayout

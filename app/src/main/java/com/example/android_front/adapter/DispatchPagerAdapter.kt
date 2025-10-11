@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
 import com.example.android_front.model.DispatchDetailResponse
@@ -64,11 +65,21 @@ class DispatchPagerAdapter(
             holder.tvDepartureTime.text = "${item.dispatchDate.replace("-", ".")} | ${item.scheduledDepartureTime.substringAfter("T").substring(0, 5)} ~ ${item.scheduledArrivalTime.substringAfter("T").substring(0, 5)}"
             holder.tvDriveStatus.text = "${item.status.displayName ?: "-"}"
 
+            // 상태별 색상 변경
+            val colorRes = when(item.status) {
+                DispatchStatus.SCHEDULED -> R.color.blue       // 운행 전
+                DispatchStatus.COMPLETED -> R.color.green      // 완료
+                DispatchStatus.CANCELED -> R.color.red         // 취소
+                else -> R.color.gray                            // 기타
+            }
+
+            holder.tvDriveStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, colorRes))
+
             // next_action 업데이트
             holder.itemView.findViewById<TextView>(R.id.tv_next_action).text = when (item.status) {
                 DispatchStatus.SCHEDULED -> "운행 시작"
                 DispatchStatus.COMPLETED -> "결과 확인"
-                DispatchStatus.CANCELED -> "취소 배차"
+                DispatchStatus.CANCELED -> "배차 취소"
                 else -> "운행 중"
             }
         } else if (holder is EmptyViewHolder) {

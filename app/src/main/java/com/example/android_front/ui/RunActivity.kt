@@ -170,7 +170,7 @@ class RunActivity : AppCompatActivity() {
                         ?.filterNotNull()
                         ?.collectLatest { obdData ->
                             // UI 업데이트
-                            tvCurrentSpeed.text = "${obdData.speed.toInt()} km/h"
+                            tvCurrentSpeed.text = "${obdData.speed.toInt()}"
                             tvGeer.text = "${obdData.gear}"
                             tvHandle.text = "${obdData.steering.toInt()}°"
 

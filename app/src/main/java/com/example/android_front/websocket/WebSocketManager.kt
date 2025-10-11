@@ -61,7 +61,7 @@ object WebSocketManager {
         // ✅ Create STOMP client
         stompClient = Stomp.over(
             Stomp.ConnectionProvider.OKHTTP,
-            "ws://192.168.0.34:8080/ws-native",
+            "ws://172.30.1.74:8080/ws-native",
             null,
             okHttpClient
         )

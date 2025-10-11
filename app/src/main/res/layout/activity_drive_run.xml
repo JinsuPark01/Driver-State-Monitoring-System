@@ -10,23 +10,24 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
         <!-- 운전자 카드 -->
 
         <!-- 점수 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_drive_card"
-            android:elevation="4dp"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_drive_card_no_padding"
+            android:orientation="vertical">
 
             <!-- 상단: 날짜 및 프로필 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -50,7 +51,7 @@
                         android:id="@+id/tv_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="May 16, 2021"
+                        android:text="2025-10-10"
                         android:textColor="@color/gray"
                         android:textSize="12sp" />
 
@@ -71,10 +72,12 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <View
+                        <ImageView
                             android:layout_width="8dp"
                             android:layout_height="8dp"
-                            android:background="@drawable/ic_green_circle" />  <!-- 녹색 원형 상태 -->
+                            android:src="@drawable/bg_circle"
+                            app:tint="@color/green" />
+
 
                         <TextView
                             android:id="@+id/tv_status"
@@ -87,34 +90,41 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- 구분선 -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="#DDDDDD" />
-
             <!-- 하단: 속도 및 기어, 핸들 각도 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="4">
+                android:weightSum="3">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:gravity="center"
+                    android:layout_weight="1"
                     android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="1dp"
+                        android:background="#449fd5" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="현재 속도"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/tv_current_speed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:layout_marginStart="12dp"
+                        android:text="100.2"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -122,230 +132,169 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="현재 속도"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Km/h"
                         android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="1dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="#DDDDDD" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:layout_gravity="bottom"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tv_geer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="N"
-                        android:textColor="@color/black"
-                        android:textSize="18sp" />
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="5dp"
+                        android:background="#488DD1" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="기어"
-                        android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#DDDDDD" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:layout_gravity="bottom"
                     android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="#4B7ECC" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="핸들각"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/tv_steer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100°"
+                        android:layout_marginStart="12dp"
+                        android:text="150.2°"
                         android:textColor="@color/black"
-                        android:textSize="18sp"
-                        />
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="핸들각"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="-"
                         android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="5dp"
+                        android:background="#506DC5" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#DDDDDD" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:layout_marginEnd="1dp"
+                        android:background="#555cc1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="기어 상태"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_geer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="N"
+                        android:textColor="@color/black"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="단"
+                        android:textColor="@color/gray"
+                        android:textSize="10sp" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_drive_card"
-            android:elevation="4dp"
-            android:orientation="horizontal"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:weightSum="4">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_sleep"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0회"
-                    android:textColor="@color/black"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="졸음운전"
-                    android:textColor="@color/gray"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#DDDDDD" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_over_speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0회"
-                    android:textColor="@color/black"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="급가속"
-                    android:textColor="@color/gray"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#DDDDDD" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_under_speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0회"
-                    android:textColor="@color/black"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="급제동"
-                    android:textColor="@color/gray"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#DDDDDD" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_abnormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0회"
-                    android:textColor="@color/black"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="이상행동"
-                    android:textColor="@color/gray"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:layout_marginTop="16dp">
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                <!-- Camera Preview -->
-                <androidx.camera.view.PreviewView
-                    android:id="@+id/viewFinder"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-            </androidx.cardview.widget.CardView>
+            android:background="@drawable/bg_card_top_rounded"
+            android:clipToOutline="true">
+
             <!-- 가운데 표시 텍스트 -->
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/viewFinder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
             <TextView
                 android:id="@+id/tvOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="경고!"
-                android:textColor="@android:color/white"
-                android:textSize="24sp"
                 android:layout_gravity="center"
                 android:background="#60FF0000"
-                android:padding="8dp"
                 android:gravity="center"
-                android:visibility="gone"/>
+                android:padding="16dp"
+                android:text="경고!"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:id="@+id/statusOverlay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp"
                 android:layout_gravity="top|end"
-                android:background="#40000000">
+                android:background="@drawable/bg_status_overlay"
+                android:orientation="vertical"
+                android:paddingVertical="8dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -358,16 +307,16 @@
                         android:layout_height="wrap_content"
                         android:text="졸음 :"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusDrowsiness"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
                         android:text="정상"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:paddingStart="4dp"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -381,16 +330,16 @@
                         android:layout_height="wrap_content"
                         android:text="담배 :"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusCigarette"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
                         android:text="비정상"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:paddingStart="4dp"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -404,16 +353,16 @@
                         android:layout_height="wrap_content"
                         android:text="전화 :"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusPhone"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
                         android:text="정상"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:paddingStart="4dp"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -427,25 +376,203 @@
                         android:layout_height="wrap_content"
                         android:text="벨트 :"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusSeatbelt"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
                         android:text="정상"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:paddingStart="4dp"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
 
         </FrameLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_drive_card_bottom_rounded"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="#449fd5" />
+
+                <TextView
+                    android:id="@+id/tv_sleep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="0회"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="졸음운전"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="5dp"
+                    android:background="#4697D3" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#DDDDDD" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="#498bd0" />
+
+                <TextView
+                    android:id="@+id/tv_over_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="0회"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="급가속"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="5dp"
+                    android:background="#4B7ECC" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#DDDDDD" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="#4f71c8" />
+
+                <TextView
+                    android:id="@+id/tv_under_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="0회"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="급제동"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="5dp"
+                    android:background="#5364C5" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#DDDDDD" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="#555cc1" />
+
+                <TextView
+                    android:id="@+id/tv_abnormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="0회"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="이상행동"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 
-
-    <!-- 하단 네비게이션 바 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
