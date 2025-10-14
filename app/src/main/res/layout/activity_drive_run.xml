@@ -14,8 +14,6 @@
         android:paddingTop="16dp"
         android:paddingBottom="8dp">
         <!-- 운전자 카드 -->
-
-        <!-- 점수 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -287,105 +285,129 @@
 
             <LinearLayout
                 android:id="@+id/statusOverlay"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
+                android:layout_gravity="bottom"
                 android:background="@drawable/bg_status_overlay"
-                android:orientation="vertical"
-                android:paddingVertical="8dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="8dp">
+                android:orientation="horizontal"
+                android:paddingVertical="6dp"
+                android:weightSum="4">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvLabelDrowsiness"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="졸음 :"
+                        android:text="졸음"
                         android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusDrowsiness"
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="4dp"
+                        android:layout_marginTop="4dp"
                         android:text="정상"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp" />
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
                 </LinearLayout>
-
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/white" />
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvLabelCigarette"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="담배 :"
+                        android:text="담배"
                         android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusCigarette"
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="4dp"
-                        android:text="비정상"
+                        android:text="정상"
+                        android:layout_marginTop="4dp"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp" />
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
                 </LinearLayout>
-
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/white" />
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvLabelPhone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="전화 :"
+                        android:text="전화"
                         android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusPhone"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="4dp"
-                        android:text="정상"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tvLabelSeatbelt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="벨트 :"
+                        android:text="정상"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/white" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvLabelSeatBelt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="벨트"
                         android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvStatusSeatbelt"
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="4dp"
                         android:text="정상"
+                        android:layout_marginTop="4dp"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp" />
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>
 

@@ -35,9 +35,8 @@ class RecordActivity : AppCompatActivity() {
     private lateinit var tvDate: TextView
     private lateinit var tvDepartureTime: TextView
     private lateinit var tvArrivalTime: TextView
-    private lateinit var tvDriveStatus: TextView
 
-    private lateinit var tvSleepAvg: TextView
+    private lateinit var tvSleep: TextView
     private lateinit var tvOverSpeed: TextView
     private lateinit var tvUnderSpeed: TextView
     private lateinit var tvAbnormal: TextView
@@ -65,9 +64,8 @@ class RecordActivity : AppCompatActivity() {
         tvDate = findViewById(R.id.tvDate)
         tvDepartureTime = findViewById(R.id.tvDepartureTime)
         tvArrivalTime = findViewById(R.id.tvArrivalTime)
-        tvDriveStatus = findViewById(R.id.tvDriveStatus)
 
-        tvSleepAvg = findViewById(R.id.tv_sleep_avg)
+        tvSleep = findViewById(R.id.tv_sleep)
         tvOverSpeed = findViewById(R.id.tv_over_speed)
         tvUnderSpeed = findViewById(R.id.tv_under_speed)
         tvAbnormal = findViewById(R.id.tv_abnormal)
@@ -116,12 +114,11 @@ class RecordActivity : AppCompatActivity() {
                     val apiResponse = response.body()
                     if (response.isSuccessful && apiResponse != null && apiResponse.success && apiResponse.data != null) {
                         val detail = apiResponse.data
-                        tvVehicleNumber.text = ": ${detail.vehicleNumber}"
-                        tvRouteNumber.text = ": ${detail.routeNumber}"
-                        tvDate.text = ": ${detail.dispatchDate}"
+                        tvVehicleNumber.text = "${detail.vehicleNumber}"
+                        tvRouteNumber.text = "${detail.routeNumber}"
+                        tvDate.text = "${detail.dispatchDate}"
                         tvDepartureTime.text = ": ${detail.actualDepartureTime?.substringAfter("T")?.substringBefore(".")  ?: "미기록"}"
                         tvArrivalTime.text = ": ${detail.actualArrivalTime?.substringAfter("T")?.substringBefore(".")  ?: "미기록"}"
-                        tvDriveStatus.text = ": ${detail.status.displayName}"
                     } else {
                         Toast.makeText(this@RecordActivity, apiResponse?.message ?: "상세 조회 실패", Toast.LENGTH_SHORT).show()
                     }
@@ -145,7 +142,7 @@ class RecordActivity : AppCompatActivity() {
                         val record = apiResponse.data
                         tvDrivingScore.text = "${record.drivingScore}점"
                         circularGauge.progress = record.drivingScore
-                        tvSleepAvg.text = "${record.drowsinessCount}회"
+                        tvSleep.text = "${record.drowsinessCount}회"
                         tvOverSpeed.text = "${record.accelerationCount}회"
                         tvUnderSpeed.text = "${record.brakingCount}회"
                         tvAbnormal.text = "${record.abnormalCount}회"

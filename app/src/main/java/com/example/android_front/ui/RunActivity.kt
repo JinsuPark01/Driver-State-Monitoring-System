@@ -418,11 +418,45 @@ class RunActivity : AppCompatActivity() {
     }
 
     private fun onDrowsinessOrAbnormalBehaviorDetected(abnormalLabels: List<String>) {
-        // UI 상태 업데이트
-        tvStatusDrowsiness.text = if (abnormalLabels.contains("DROWSINESS")) "비정상" else "정상"
-        tvStatusCigarette.text = if (abnormalLabels.contains("cigarette")) "비정상" else "정상"
-        tvStatusPhone.text = if (abnormalLabels.contains("phone")) "비정상" else "정상"
-        tvStatusSeatbelt.text = if (abnormalLabels.contains("noseatbelt")) "비정상" else "정상"
+        // 색상 정의
+        val green = ContextCompat.getColor(this, android.R.color.holo_green_dark)
+        val red = ContextCompat.getColor(this, android.R.color.holo_red_dark)
+
+        // 졸음 상태
+        if (abnormalLabels.contains("DROWSINESS")) {
+            tvStatusDrowsiness.text = "비정상"
+            tvStatusDrowsiness.setTextColor(red)
+        } else {
+            tvStatusDrowsiness.text = "정상"
+            tvStatusDrowsiness.setTextColor(green)
+        }
+
+        // 담배 상태
+        if (abnormalLabels.contains("cigarette")) {
+            tvStatusCigarette.text = "비정상"
+            tvStatusCigarette.setTextColor(red)
+        } else {
+            tvStatusCigarette.text = "정상"
+            tvStatusCigarette.setTextColor(green)
+        }
+
+        // 휴대폰 상태
+        if (abnormalLabels.contains("phone")) {
+            tvStatusPhone.text = "비정상"
+            tvStatusPhone.setTextColor(red)
+        } else {
+            tvStatusPhone.text = "정상"
+            tvStatusPhone.setTextColor(green)
+        }
+
+        // 안전벨트 상태
+        if (abnormalLabels.contains("noseatbelt")) {
+            tvStatusSeatbelt.text = "비정상"
+            tvStatusSeatbelt.setTextColor(red)
+        } else {
+            tvStatusSeatbelt.text = "정상"
+            tvStatusSeatbelt.setTextColor(green)
+        }
 
         // tvOverlay 업데이트
         if (abnormalLabels.isNotEmpty()) {

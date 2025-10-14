@@ -34,13 +34,13 @@ import com.example.android_front.model.DispatchDetailResponse
 class MainActivity : AppCompatActivity() {
 
     private lateinit var tvPageTitle: TextView
-    private lateinit var ivAlarm: ImageView
     private lateinit var tvViewMore: TextView
     private lateinit var btnMyPage: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
     private lateinit var rvDrivingScores: RecyclerView
     private lateinit var scoreAdapter: ScoreAdapter
+    private lateinit var ivAlarm: ImageView
     private lateinit var vRedDot: View
     private lateinit var tvNoDispatchMessage: TextView
 
@@ -244,32 +244,32 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
-//                DispatchStatus.SCHEDULED -> {
-//                    AlertDialog.Builder(this)
-//                        .setTitle("운행 시작")
-//                        .setMessage("운행을 시작하시겠습니까?")
-//                        .setPositiveButton("확인") { _, _ ->
-//                            startDispatch(dispatch.dispatchId, dispatch.driverName, dispatch.dispatchDate)
-//                        }
-//                        .setNegativeButton("취소", null)
-//                        .show()
-//                }
-                //테스트용
                 DispatchStatus.SCHEDULED -> {
                     AlertDialog.Builder(this)
                         .setTitle("운행 시작")
                         .setMessage("운행을 시작하시겠습니까?")
                         .setPositiveButton("확인") { _, _ ->
-                            val intent = Intent(this, RunActivity::class.java).apply {
-                                putExtra("dispatchId", dispatch.dispatchId)
-                                putExtra("driverName", dispatch.driverName)
-                                putExtra("dispatchDate", dispatch.dispatchDate)
-                            }
-                            startActivity(intent)
+                            startDispatch(dispatch.dispatchId, dispatch.driverName, dispatch.dispatchDate)
                         }
                         .setNegativeButton("취소", null)
                         .show()
                 }
+                //테스트용
+//                DispatchStatus.SCHEDULED -> {
+//                    AlertDialog.Builder(this)
+//                        .setTitle("운행 시작")
+//                        .setMessage("운행을 시작하시겠습니까?")
+//                        .setPositiveButton("확인") { _, _ ->
+//                            val intent = Intent(this, RunActivity::class.java).apply {
+//                                putExtra("dispatchId", dispatch.dispatchId)
+//                                putExtra("driverName", dispatch.driverName)
+//                                putExtra("dispatchDate", dispatch.dispatchDate)
+//                            }
+//                            startActivity(intent)
+//                        }
+//                        .setNegativeButton("취소", null)
+//                        .show()
+//                }
                 DispatchStatus.COMPLETED -> {
                     val intent = Intent(this, RecordActivity::class.java)
                     intent.putExtra("dispatchId", dispatch.dispatchId)
