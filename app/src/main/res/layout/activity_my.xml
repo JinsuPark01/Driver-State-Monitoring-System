@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text=" 나의 정보"
+            android:fontFamily="@font/pretendard_bold"
             android:textSize="18sp"
             android:textColor="@color/white"
             android:textStyle="bold" />
@@ -96,26 +97,21 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="박진수 드라이버"
+                        android:fontFamily="@font/pretendard_bold"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:textSize="18sp" />
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="4dp"
-                            android:text="면허 번호 :"
-                            android:textColor="@color/white"
-                            android:textSize="12sp" />
+
                         <TextView
                             android:id="@+id/tv_licenseNumber"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="21-19-174133-01"
+                            android:fontFamily="@font/pretendard_regular"
                             android:textColor="@color/white"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -134,7 +130,8 @@
                     android:gravity="center"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"
-                    android:text="등급"
+                    android:text="경력"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
                 <TextView
@@ -144,7 +141,8 @@
                     android:gravity="center"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"
-                    android:text="경력"
+                    android:text="등급"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
                 <TextView
@@ -155,6 +153,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"
                     android:text="회사"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -166,25 +165,25 @@
                 android:gravity="bottom"
                 android:weightSum="3">
                 <TextView
-                    android:id="@+id/tv_grade"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="A"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-                <TextView
                     android:id="@+id/tv_careerYear"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="18년"
+                    android:fontFamily="@font/pretendard_semibold"
                     android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/tv_grade"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="A"
+                    android:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
                 <TextView
                     android:id="@+id/tv_operator"
                     android:layout_width="0dp"
@@ -192,9 +191,9 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="반성물산"
+                    android:fontFamily="@font/pretendard_semibold"
                     android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -211,6 +210,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="배차 결과 조회"
+            android:fontFamily="@font/pretendard_bold"
             android:textSize="16sp"
             android:textStyle="bold"
             android:paddingHorizontal="16dp"/>
@@ -221,7 +221,7 @@
             android:layout_marginBottom="16dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
+            android:paddingHorizontal="48dp">
 
             <!-- 왼쪽 버튼 -->
             <LinearLayout
@@ -252,6 +252,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:text="2025-03-29"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textSize="15sp" />
 
                 <ImageView
@@ -291,9 +292,10 @@
         <TextView
             android:id="@+id/tvNoDispatch"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="100dp"
             android:text="배차 조회에 실패하였습니다"
-            android:textSize="20sp"
+            android:fontFamily="@font/pretendard_regular"
+            android:textSize="14sp"
             android:textColor="#888888"
             android:gravity="center"
             android:layout_marginStart="20dp"
@@ -329,6 +331,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="근태 관리"
+            android:fontFamily="@font/pretendard_medium"
             android:textSize="14sp" />
         <ImageView
             android:layout_width="15dp"
@@ -359,6 +362,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="휴가 신청"
+            android:fontFamily="@font/pretendard_medium"
             android:textSize="14sp" />
         <ImageView
             android:layout_width="15dp"
@@ -389,6 +393,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="운행 마일리지"
+            android:fontFamily="@font/pretendard_medium"
             android:textSize="14sp" />
         <ImageView
             android:layout_width="15dp"
@@ -417,6 +422,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="내정보 수정"
+            android:fontFamily="@font/pretendard_medium"
             android:textSize="14sp" />
         <ImageView
             android:layout_width="15dp"
@@ -446,6 +452,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="비밀번호 변경"
+            android:fontFamily="@font/pretendard_medium"
             android:textSize="14sp" />
         <ImageView
             android:layout_width="15dp"
@@ -474,6 +481,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="로그아웃"
+            android:fontFamily="@font/pretendard_medium"
             android:textColor="@color/red"
             android:textSize="14sp" />
     </LinearLayout>

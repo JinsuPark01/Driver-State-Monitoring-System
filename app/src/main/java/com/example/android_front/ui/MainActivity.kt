@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvPageTitle: TextView
     private lateinit var tvViewMore: TextView
     private lateinit var btnMyPage: LinearLayout
+    private lateinit var btnSetting: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
     private lateinit var rvDrivingScores: RecyclerView
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         tvPageTitle = findViewById(R.id.tv_page_title)
         tvViewMore = findViewById(R.id.tvViewMore)
         btnMyPage = findViewById(R.id.btn_myPage)
+        btnSetting = findViewById(R.id.btn_setting)
         viewPager = findViewById(R.id.viewPager)
         indicatorLayout = findViewById(R.id.indicator_layout)
         rvDrivingScores = findViewById(R.id.rvDrivingScores)
@@ -76,6 +78,10 @@ class MainActivity : AppCompatActivity() {
 
         btnMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))
+        }
+
+        btnSetting.setOnClickListener {
+            startActivity(Intent(this, SettingActivity::class.java))
         }
 
         tvViewMore.setOnClickListener {

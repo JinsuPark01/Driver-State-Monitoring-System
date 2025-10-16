@@ -75,8 +75,8 @@
                 android:layout_height="wrap_content"
                 android:text="운전의 진수"
                 android:textColor="@color/main"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+                android:fontFamily="@font/pretendard_bold"
+                android:textSize="28sp" />
 
             <TextView
                 android:id="@+id/tvDesc1"
@@ -84,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="AI 활용 차량 관제 시스템"
+                android:fontFamily="@font/pretendard_regular"
                 android:textColor="#757575"
                 android:textSize="16sp" />
 
@@ -99,6 +100,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginEnd="24dp"
         android:text="로그인 후 서비스를 이용하실 수 있습니다."
+        android:fontFamily="@font/pretendard_regular"
         android:textColor="#757575"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -114,6 +116,7 @@
         android:layout_marginEnd="24dp"
         android:background="@drawable/bg_input_field"
         android:hint="아이디 입력"
+        android:fontFamily="@font/pretendard_regular"
         android:inputType="text"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -131,6 +134,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="24dp"
         android:textColor="@android:color/holo_red_dark"
+        android:fontFamily="@font/pretendard_regular"
         android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -145,7 +149,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginEnd="24dp"
         android:background="@drawable/bg_input_field"
-
+        android:fontFamily="@font/pretendard_regular"
         android:hint="비밀번호 입력"
         android:inputType="textPassword"
         android:paddingStart="16dp"
@@ -164,6 +168,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="24dp"
         android:textColor="@android:color/holo_red_dark"
+        android:fontFamily="@font/pretendard_regular"
         android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -179,6 +184,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
         android:text="회원가입"
+        android:fontFamily="@font/pretendard_medium"
         android:textAllCaps="false"
         android:textColor="@color/main"
         app:cornerRadius="24dp"
@@ -197,6 +203,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
         android:text="로그인"
+        android:fontFamily="@font/pretendard_medium"
         android:textAllCaps="false"
         app:backgroundTint="#4C7DCC"
         app:cornerRadius="28dp"

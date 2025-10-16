@@ -16,6 +16,7 @@
             android:layout_width="35dp"
             android:layout_height="wrap_content"
             android:text="23:41"
+            android:fontFamily="@font/pretendard_regular"
             android:textSize="12sp"
             android:textColor="@color/white"
             />
@@ -26,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="이상행동"
+            android:fontFamily="@font/pretendard_regular"
             android:textSize="14sp"
             android:textColor="@color/white"
             />

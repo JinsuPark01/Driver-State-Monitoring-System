@@ -117,8 +117,8 @@ class RecordActivity : AppCompatActivity() {
                         tvVehicleNumber.text = "${detail.vehicleNumber}"
                         tvRouteNumber.text = "${detail.routeNumber}"
                         tvDate.text = "${detail.dispatchDate}"
-                        tvDepartureTime.text = ": ${detail.actualDepartureTime?.substringAfter("T")?.substringBefore(".")  ?: "미기록"}"
-                        tvArrivalTime.text = ": ${detail.actualArrivalTime?.substringAfter("T")?.substringBefore(".")  ?: "미기록"}"
+                        tvDepartureTime.text = "${detail.actualDepartureTime?.substringAfter("T")?.substringBefore(".")  ?: "미기록"}"
+                        tvArrivalTime.text = "${detail.actualArrivalTime?.substringAfter("T")?.substringBefore(".")  ?: "미기록"}"
                     } else {
                         Toast.makeText(this@RecordActivity, apiResponse?.message ?: "상세 조회 실패", Toast.LENGTH_SHORT).show()
                     }

@@ -31,10 +31,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/pretendard_bold"
                 android:text="박진수님"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -81,25 +82,27 @@
                     android:layout_weight="1"
                     android:text="금일 배차 현황"
                     android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/pretendard_bold"
                     android:textColor="@color/white" />
                 <LinearLayout
                     android:id="@+id/tvDispatchError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="bottom">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="2dp"
-                        android:text="배차 문의"
-                        android:textSize="14sp"
-                        android:textColor="@color/white" />
                     <ImageView
                         android:layout_width="19dp"
                         android:layout_height="19dp"
                         android:src="@drawable/ic_warn"
+                        android:layout_marginEnd="4dp"
                         app:tint="@color/white"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="배차 문의"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginEnd="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/white" />
                 </LinearLayout>
             </LinearLayout>
             <!-- 배차 일지 영역 -->
@@ -118,9 +121,10 @@
             <TextView
                 android:id="@+id/tvNoDispatch"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="100dp"
                 android:text="배차 조회에 실패하였습니다"
-                android:textSize="20sp"
+                android:fontFamily="@font/pretendard_regular"
+                android:textSize="14sp"
                 android:textColor="#888888"
                 android:gravity="center"
                 android:layout_marginStart="20dp"
@@ -156,6 +160,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="4dp"
                     android:text="출발 전 알림을 받아보세요!"
+                    android:fontFamily="@font/pretendard_medium"
                     android:textSize="14sp" />
                 <ImageView
                     android:layout_width="15dp"
@@ -178,8 +183,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="6dp"
                 android:weightSum="4">
 
                 <LinearLayout
@@ -191,8 +196,8 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_monitor"
                         app:tint="#449fd5"/>
@@ -200,10 +205,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
                         android:text="모니터링"
-                        android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -215,8 +220,8 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_person"
                         app:tint="#498bd0" />
@@ -224,10 +229,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
                         android:text="마이페이지"
-                        android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -239,8 +244,8 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_speaker"
                         app:tint="#4f71c8"/>
@@ -248,10 +253,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
                         android:text="공지사항"
-                        android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -263,8 +268,8 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_setting"
                         app:tint="#555cc1"/>
@@ -272,10 +277,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="6dp"
                         android:text="설정"
-                        android:textColor="@color/gray"
-                        android:textSize="14sp" />
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -298,6 +303,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="운행 점수 분석"
+                    android:fontFamily="@font/pretendard_bold"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -311,6 +317,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="자세히 보기 →"
+                    android:fontFamily="@font/pretendard_medium"
                     android:textSize="14sp"
                     android:textColor="#888888" />
             </LinearLayout>

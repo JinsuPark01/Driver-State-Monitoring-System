@@ -1,9 +1,11 @@
 package com.example.android_front.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
 import com.example.android_front.model.DispatchEventsResponse
@@ -29,6 +31,17 @@ class DispatchEventAdapter(
 
         holder.tvEventType.text = event.eventType.warningName
         holder.tvEventTime.text = event.eventTimestamp.substringAfter("T").substring(0, 5)
+
+        // 배경색 변경 로직
+        val bg = holder.itemView.background
+        val color = when (event.eventType.warningName) {
+            "급가속" -> ContextCompat.getColor(holder.itemView.context, R.color.over)
+            "급제동" -> ContextCompat.getColor(holder.itemView.context, R.color.under)
+            "졸음" -> ContextCompat.getColor(holder.itemView.context, R.color.drowsiness)
+            "이상행동" -> ContextCompat.getColor(holder.itemView.context, R.color.abnormal)
+            else -> ContextCompat.getColor(holder.itemView.context, R.color.gray_light)
+        }
+        bg?.setTint(color)
 
         // 클릭 리스너
         holder.itemView.setOnClickListener {

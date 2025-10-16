@@ -31,16 +31,16 @@
                     android:id="@+id/tvRouteNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
                     android:text="1550-1번"
-                    android:textSize="24sp"
-                    android:textStyle="bold"/>
+                    android:fontFamily="@font/pretendard_semibold"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/tvVehicleNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=" (157거 1535)"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -63,6 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="2025.10.10 | 09:00 ~ 11:00"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -85,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="운행 전"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/pretendard_semibold"
                     android:textColor="@color/blue"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -112,6 +113,7 @@
                 android:rotation="-90"
                 android:translationX="-10dp"
                 android:text="운행 시작"
+                android:fontFamily="@font/pretendard_regular"
                 android:textColor="#888888"
                 android:textSize="16sp"
                 />

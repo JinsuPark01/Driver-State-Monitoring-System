@@ -271,32 +271,32 @@ class MyPageActivity : AppCompatActivity() {
     private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
             when (dispatch.status) {
-//                DispatchStatus.SCHEDULED -> {
-//                    AlertDialog.Builder(this)
-//                        .setTitle("운행 시작")
-//                        .setMessage("운행을 시작하시겠습니까?")
-//                        .setPositiveButton("확인") { _, _ ->
-//                            startDispatch(dispatch.dispatchId, dispatch.driverName, dispatch.dispatchDate)
-//                        }
-//                        .setNegativeButton("취소", null)
-//                        .show()
-//                }
-                //테스트용
                 DispatchStatus.SCHEDULED -> {
                     AlertDialog.Builder(this)
                         .setTitle("운행 시작")
                         .setMessage("운행을 시작하시겠습니까?")
                         .setPositiveButton("확인") { _, _ ->
-                            val intent = Intent(this, RunActivity::class.java).apply {
-                                putExtra("dispatchId", dispatch.dispatchId)
-                                putExtra("driverName", dispatch.driverName)
-                                putExtra("dispatchDate", dispatch.dispatchDate)
-                            }
-                            startActivity(intent)
+                            startDispatch(dispatch.dispatchId, dispatch.driverName, dispatch.dispatchDate)
                         }
                         .setNegativeButton("취소", null)
                         .show()
                 }
+                //테스트용
+//                DispatchStatus.SCHEDULED -> {
+//                    AlertDialog.Builder(this)
+//                        .setTitle("운행 시작")
+//                        .setMessage("운행을 시작하시겠습니까?")
+//                        .setPositiveButton("확인") { _, _ ->
+//                            val intent = Intent(this, RunActivity::class.java).apply {
+//                                putExtra("dispatchId", dispatch.dispatchId)
+//                                putExtra("driverName", dispatch.driverName)
+//                                putExtra("dispatchDate", dispatch.dispatchDate)
+//                            }
+//                            startActivity(intent)
+//                        }
+//                        .setNegativeButton("취소", null)
+//                        .show()
+//                }
                 DispatchStatus.COMPLETED -> {
                     startActivity(
                         Intent(this, RecordActivity::class.java).apply {

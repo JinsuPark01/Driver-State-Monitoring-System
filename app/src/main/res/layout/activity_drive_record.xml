@@ -30,8 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=" 운행 기록 확인"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:fontFamily="@font/pretendard_bold"
+                android:textSize="18sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,16 +44,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvDrivingScoreTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="최종 점수"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="@font/pretendard_bold"
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -65,69 +64,72 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="자세히 보기 →"
+                    android:fontFamily="@font/pretendard_medium"
                     android:textSize="14sp"
                     android:textColor="#888888" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp">
 
-                android:weightSum="3">
-                <LinearLayout
-                    android:layout_width="0dp"
+                <!-- 운행 점수 영역 -->
+                <FrameLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:layout_gravity="center">
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/item_circular_gauge_bar"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:progress="60"
+                        app:indicatorColor="@color/main"
+                        app:indicatorDirectionCircular="clockwise"
+                        app:indicatorSize="110dp"
+                        app:trackColor="@color/gray_light"
+                        app:trackThickness="14dp" />
 
-                    <!-- 운행 점수 영역 -->
-                    <FrameLayout
+                    <TextView
+                        android:id="@+id/tv_circular_gauge_percentage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center">
-                        <com.google.android.material.progressindicator.CircularProgressIndicator
-                            android:id="@+id/item_circular_gauge_bar"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:progress="60"
-                            app:indicatorColor="@color/main"
-                            app:indicatorDirectionCircular="clockwise"
-                            app:indicatorSize="90dp"
-                            app:trackColor="@color/gray_light"
-                            app:trackThickness="10dp" />
+                        android:layout_gravity="center"
+                        android:text="60점"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+                </FrameLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="3">
 
-                        <TextView
-                            android:id="@+id/tv_circular_gauge_percentage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="60점"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </FrameLayout>
-                </LinearLayout>
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
+                    android:layout_weight="3"
                     android:orientation="vertical"
-                    android:paddingEnd="16dp">
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="2dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:weightSum="2"
-                        android:layout_marginBottom="18dp">
+                        android:layout_marginBottom="8dp">
                         <!-- 졸음운전 -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="horizontal"
-                            android:gravity="bottom">
+                            android:gravity="bottom"
+                            android:layout_marginEnd="16dp">
 
                             <ImageView
                                 android:layout_width="5dp"
@@ -140,6 +142,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="졸음운전"
+                                android:fontFamily="@font/pretendard_regular"
                                 android:textSize="14sp" />
 
                             <TextView
@@ -149,9 +152,8 @@
                                 android:layout_weight="1"
                                 android:gravity="right"
                                 android:text="1회"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:layout_marginEnd="10dp"/>
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textSize="14sp" />
                         </LinearLayout>
                         <!-- 급가속 -->
                         <LinearLayout
@@ -173,6 +175,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="급가속"
+                                android:fontFamily="@font/pretendard_regular"
                                 android:textSize="14sp" />
 
                             <TextView
@@ -182,7 +185,7 @@
                                 android:layout_weight="1"
                                 android:gravity="right"
                                 android:text="1회"
-                                android:textStyle="bold"
+                                android:fontFamily="@font/pretendard_bold"
                                 android:textSize="14sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -197,7 +200,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="horizontal"
-                            android:gravity="bottom">
+                            android:gravity="bottom"
+                            android:layout_marginEnd="16dp">
                             <ImageView
                                 android:layout_width="5dp"
                                 android:layout_height="19dp"
@@ -209,6 +213,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="이상행동"
+                                android:fontFamily="@font/pretendard_regular"
                                 android:textSize="14sp" />
 
                             <TextView
@@ -218,9 +223,8 @@
                                 android:layout_weight="1"
                                 android:gravity="right"
                                 android:text="1회"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:layout_marginEnd="10dp"/>
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textSize="14sp" />
                         </LinearLayout>
                         <!-- 이상행동 -->
                         <LinearLayout
@@ -242,6 +246,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="급제동"
+                                android:fontFamily="@font/pretendard_regular"
                                 android:textSize="14sp" />
 
                             <TextView
@@ -251,7 +256,7 @@
                                 android:layout_weight="1"
                                 android:gravity="right"
                                 android:text="1회"
-                                android:textStyle="bold"
+                                android:fontFamily="@font/pretendard_bold"
                                 android:textSize="14sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -279,7 +284,7 @@
                     android:layout_height="wrap_content"
                     android:text="노선 / 차량 번호"
                     android:textSize="12sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/pretendard_semibold"
                     android:paddingTop="6dp"/>
 
                 <!-- 노선 번호 -->
@@ -294,12 +299,14 @@
                         android:layout_height="wrap_content"
                         android:text="1550-1번"
                         android:textColor="@color/gray"
+                        android:fontFamily="@font/pretendard_regular"
                         android:textSize="16sp"
                         android:padding="4dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="/"
+                        android:fontFamily="@font/pretendard_regular"
                         android:textColor="@color/gray"
                         android:textSize="16sp"
                         android:paddingVertical="4dp"/>
@@ -309,6 +316,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="157거 1535"
+                        android:fontFamily="@font/pretendard_regular"
                         android:textColor="@color/gray"
                         android:textSize="16sp"
                         android:padding="4dp"/>
@@ -321,14 +329,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="날짜"
+                    android:fontFamily="@font/pretendard_semibold"
                     android:textSize="12sp"
-                    android:textStyle="bold"
                     android:paddingTop="6dp" />
                 <TextView
                     android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2025-08-10"
+                    android:fontFamily="@font/pretendard_regular"
                     android:textColor="@color/gray"
                     android:textSize="16sp"
                     android:padding="4dp"/>
@@ -353,7 +362,7 @@
                             android:layout_height="wrap_content"
                             android:text="실제 출발 시간"
                             android:textSize="12sp"
-                            android:textStyle="bold" />
+                            android:fontFamily="@font/pretendard_semibold" />
                     </LinearLayout>
                     <View
                         android:layout_width="1dp"
@@ -369,8 +378,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="실제 도착 시간"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                            android:fontFamily="@font/pretendard_semibold"
+                            android:textSize="12sp" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -390,6 +399,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="00:00:00"
+                            android:fontFamily="@font/pretendard_regular"
                             android:textColor="@color/gray"
                             android:textSize="16sp"
                             android:padding="4dp"/>
@@ -411,6 +421,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="00:00:00"
+                            android:fontFamily="@font/pretendard_regular"
                             android:textColor="@color/gray"
                             android:textSize="16sp"
                             android:padding="4dp"/>
@@ -434,15 +445,23 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
-                android:background="@drawable/bg_card_left_rounded"
-                android:clipToOutline="true"
-                >
+                android:background="@drawable/bg_drive_card_left_rounded">
                 <!--지도 추가-->
-                <com.kakao.vectormap.MapView
-                    android:id="@+id/map_view"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:background="@color/gray_light" />
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_card_left_rounded"
+                    android:clipToOutline="true"
+                    >
+                    <!--지도 추가-->
+                    <com.kakao.vectormap.MapView
+                        android:id="@+id/map_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:background="@color/gray_light" />
+
+                </LinearLayout>
 
             </LinearLayout>
             <LinearLayout
@@ -451,8 +470,8 @@
                 android:layout_weight="2"
                 android:background="@drawable/bg_drive_card_right_rounded"
                 android:orientation="horizontal"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp">
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="8dp">
                 <TextView
                     android:id="@+id/tvEvents"
                     android:layout_width="match_parent"

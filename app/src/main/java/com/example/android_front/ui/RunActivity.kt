@@ -501,7 +501,10 @@ class RunActivity : AppCompatActivity() {
                         socketService?.disconnectAll()
                         unbindService(connection)
                         isBound = false
-
+                        // ✅ 메인화면으로 복귀
+                        val intent = Intent(this@RunActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
                         finish()
                     } else {
                         Toast.makeText(this@RunActivity, "운행 종료 실패", Toast.LENGTH_SHORT).show()
