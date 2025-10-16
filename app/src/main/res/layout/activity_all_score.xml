@@ -1,394 +1,391 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5">
-    <!-- 제목 영역 -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_back_arrow" />
-
-        <TextView
-            android:id="@+id/tv_page_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" 운행 기록"
-            android:fontFamily="@font/pretendard_bold"
-            android:textSize="18sp" />
-    </LinearLayout>
-    <!-- 금주 평균 점수 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="4dp"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp">
-        <!-- 제목 -->
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!-- 제목 영역 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_back_arrow" />
 
             <TextView
-                android:id="@+id/tvDrivingScoreTitle"
+                android:id="@+id/tv_page_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="최근 평균 점수"
+                android:text=" 운행 기록"
+                android:fontFamily="@font/pretendard_bold"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <!-- 금주 평균 점수 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
+            <!-- 제목 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvDrivingScoreTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="최근 평균 점수"
+                    android:fontFamily="@font/pretendard_bold"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp">
+
+                <!-- 운행 점수 영역 -->
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/item_circular_gauge_bar"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:progress="60"
+                        app:indicatorColor="@color/main"
+                        app:indicatorDirectionCircular="clockwise"
+                        app:indicatorSize="110dp"
+                        app:trackColor="@color/gray_light"
+                        app:trackThickness="14dp" />
+
+                    <TextView
+                        android:id="@+id/tv_circular_gauge_percentage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="100점"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+                </FrameLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="2dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_marginBottom="8dp">
+                        <!-- 졸음운전 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="bottom"
+                            android:layout_marginEnd="16dp">
+
+                            <ImageView
+                                android:layout_width="5dp"
+                                android:layout_height="19dp"
+                                android:src="@drawable/bg_button"
+                                android:layout_marginEnd="5dp"
+                                app:tint="#449fd5"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="졸음운전"
+                                android:fontFamily="@font/pretendard_regular"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_sleep"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0회"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                        <!-- 급가속 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <ImageView
+                                android:layout_width="5dp"
+                                android:layout_height="19dp"
+                                android:src="@drawable/bg_button"
+                                android:layout_marginEnd="5dp"
+                                android:layout_marginStart="8dp"
+                                app:tint="#498bd0"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="급가속"
+                                android:fontFamily="@font/pretendard_regular"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_over_speed"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0회"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+                        <!-- 급제동 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="bottom"
+                            android:layout_marginEnd="16dp">
+                            <ImageView
+                                android:layout_width="5dp"
+                                android:layout_height="19dp"
+                                android:src="@drawable/bg_button"
+                                android:layout_marginEnd="5dp"
+                                app:tint="#555cc1"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="이상행동"
+                                android:fontFamily="@font/pretendard_regular"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_abnormal"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0회"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                        <!-- 이상행동 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <ImageView
+                                android:layout_width="5dp"
+                                android:layout_height="19dp"
+                                android:src="@drawable/bg_button"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="5dp"
+                                app:tint="#4f71c8"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="급제동"
+                                android:fontFamily="@font/pretendard_regular"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_under_speed"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="0회"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <!-- 그래프 영역 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+            <!-- 그래프 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="최근 점수 변화"
                 android:fontFamily="@font/pretendard_bold"
                 android:textSize="16sp" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:layout_marginBottom="12dp">
-
-            <!-- 운행 점수 영역 -->
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/item_circular_gauge_bar"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:progress="60"
-                    app:indicatorColor="@color/main"
-                    app:indicatorDirectionCircular="clockwise"
-                    app:indicatorSize="110dp"
-                    app:trackColor="@color/gray_light"
-                    app:trackThickness="14dp" />
-
-                <TextView
-                    android:id="@+id/tv_circular_gauge_percentage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="100점"
-                    android:fontFamily="@font/pretendard_bold"
-                    android:textColor="@color/black"
-                    android:textSize="20sp" />
-            </FrameLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="2dp">
+                android:background="@drawable/bg_drive_card"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/line_chart_driveScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginBottom="24dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DDDDDD" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:weightSum="4"
                     android:orientation="horizontal"
-                    android:weightSum="2"
                     android:layout_marginBottom="8dp">
-                    <!-- 졸음운전 -->
+
                     <LinearLayout
+                        android:id="@+id/btn_sleep"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:gravity="bottom"
-                        android:layout_marginEnd="16dp">
-
-                        <ImageView
-                            android:layout_width="5dp"
-                            android:layout_height="19dp"
-                            android:src="@drawable/bg_button"
-                            android:layout_marginEnd="5dp"
-                            app:tint="#449fd5"/>
-
+                        android:gravity="center"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="졸음운전"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tv_sleep"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0회"
-                            android:fontFamily="@font/pretendard_bold"
-                            android:textSize="14sp" />
+                            android:fontFamily="@font/pretendard_medium"
+                            android:padding="8dp"
+                            android:textSize="12sp"/>
+                        <View
+                            android:id="@+id/selected_sleep"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/drowsiness" />
                     </LinearLayout>
-                    <!-- 급가속 -->
                     <LinearLayout
+                        android:id="@+id/btn_over"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:gravity="bottom">
-
-                        <ImageView
-                            android:layout_width="5dp"
-                            android:layout_height="19dp"
-                            android:src="@drawable/bg_button"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginStart="8dp"
-                            app:tint="#498bd0"/>
-
+                        android:gravity="center"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="급가속"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tv_over_speed"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0회"
-                            android:fontFamily="@font/pretendard_bold"
-                            android:textSize="14sp" />
+                            android:fontFamily="@font/pretendard_medium"
+                            android:padding="8dp"
+                            android:textSize="12sp"/>
+                        <View
+                            android:id="@+id/selected_over"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/white" />
                     </LinearLayout>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
-                    <!-- 급제동 -->
                     <LinearLayout
+                        android:id="@+id/btn_under"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:gravity="bottom"
-                        android:layout_marginEnd="16dp">
-                        <ImageView
-                            android:layout_width="5dp"
-                            android:layout_height="19dp"
-                            android:src="@drawable/bg_button"
-                            android:layout_marginEnd="5dp"
-                            app:tint="#555cc1"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="이상행동"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tv_abnormal"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0회"
-                            android:fontFamily="@font/pretendard_bold"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                    <!-- 이상행동 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:gravity="bottom">
-
-                        <ImageView
-                            android:layout_width="5dp"
-                            android:layout_height="19dp"
-                            android:src="@drawable/bg_button"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="5dp"
-                            app:tint="#4f71c8"/>
-
+                        android:gravity="center"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="급제동"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:textSize="14sp" />
-
+                            android:fontFamily="@font/pretendard_medium"
+                            android:padding="8dp"
+                            android:textSize="12sp"/>
+                        <View
+                            android:id="@+id/selected_under"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/white" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/btn_abnormal"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
                         <TextView
-                            android:id="@+id/tv_under_speed"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="right"
-                            android:text="0회"
-                            android:fontFamily="@font/pretendard_bold"
-                            android:textSize="14sp" />
+                            android:text="이상행동"
+                            android:fontFamily="@font/pretendard_medium"
+                            android:padding="8dp"
+                            android:textSize="12sp"/>
+                        <View
+                            android:id="@+id/selected_abnormal"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/white" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <!-- MPAndroidChart -->
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/line_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginBottom="8dp"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-    <!-- 그래프 영역 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
-        <!-- 그래프 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="최근 점수 변화"
-            android:fontFamily="@font/pretendard_bold"
-            android:textSize="16sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_drive_card"
-            android:gravity="center"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="5"
-                android:layout_marginBottom="12dp"
-                android:orientation="horizontal">
-                <LinearLayout
-                    android:id="@+id/btn_all"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="전체"
-                        android:fontFamily="@font/pretendard_medium"
-                        android:padding="6dp"
-                        android:textSize="12sp"/>
-                    <View
-                        android:id="@+id/selected_all"
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
-                        android:background="@color/main" />
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btn_sleep"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="졸음운전"
-                        android:fontFamily="@font/pretendard_medium"
-                        android:padding="6dp"
-                        android:textSize="12sp"/>
-                    <View
-                        android:id="@+id/selected_sleep"
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
-                        android:background="@color/white" />
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btn_abnormal"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="이상행동"
-                        android:fontFamily="@font/pretendard_medium"
-                        android:padding="6dp"
-                        android:textSize="12sp"/>
-                    <View
-                        android:id="@+id/selected_abnormal"
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
-                        android:background="@color/white" />
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btn_over"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="급가속"
-                        android:fontFamily="@font/pretendard_medium"
-                        android:padding="6dp"
-                        android:textSize="12sp"/>
-                    <View
-                        android:id="@+id/selected_over"
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
-                        android:background="@color/white" />
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btn_under"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="급제동"
-                        android:fontFamily="@font/pretendard_medium"
-                        android:padding="6dp"
-                        android:textSize="12sp"/>
-                    <View
-                        android:id="@+id/selected_under"
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
-                        android:background="@color/white" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- MPAndroidChart 예시 -->
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/line_chart"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_marginBottom="8dp"/>
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+</ScrollView>

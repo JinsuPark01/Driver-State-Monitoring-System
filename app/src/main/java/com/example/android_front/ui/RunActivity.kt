@@ -134,14 +134,10 @@ class RunActivity : AppCompatActivity() {
             Toast.makeText(this, "테스트: 졸음감지 이벤트 발생", Toast.LENGTH_SHORT).show()
         }
         tvAcceleration.setOnClickListener {
-            accelerationCount++
-            tvAcceleration.text = "${accelerationCount}회"
             sendWarning(WarningType.ACCELERATION)
             Toast.makeText(this, "테스트: 급가속 이벤트 발생", Toast.LENGTH_SHORT).show()
         }
         tvBraking.setOnClickListener {
-            brakingCount++
-            tvBraking.text = "${brakingCount}회"
             sendWarning(WarningType.BRAKING)
             Toast.makeText(this, "테스트: 급제동 이벤트 발생", Toast.LENGTH_SHORT).show()
         }
@@ -380,7 +376,15 @@ class RunActivity : AppCompatActivity() {
                         drowsinessCount++
                         tvDrowsiness.text = "${drowsinessCount}회"
                     }
-                    WarningType.ABNORMAL -> {
+                    WarningType.SMOKING -> {
+                        abnormalCount++
+                        tvAbnormal.text = "${abnormalCount}회"
+                    }
+                    WarningType.PHONE_USAGE -> {
+                        abnormalCount++
+                        tvAbnormal.text = "${abnormalCount}회"
+                    }
+                    WarningType.SEATBELT_UNFASTENED -> {
                         abnormalCount++
                         tvAbnormal.text = "${abnormalCount}회"
                     }
@@ -483,8 +487,14 @@ class RunActivity : AppCompatActivity() {
         if (abnormalLabels.contains("DROWSINESS")) {
             sendWarning(WarningType.DROWSINESS)
         }
-        if (abnormalLabels.any { it == "cigarette" || it == "phone" || it == "noseatbelt" }) {
-            sendWarning(WarningType.ABNORMAL)
+        if (abnormalLabels.contains("cigarette")) {
+            sendWarning(WarningType.SMOKING)
+        }
+        if (abnormalLabels.contains("phone")) {
+            sendWarning(WarningType.PHONE_USAGE)
+        }
+        if (abnormalLabels.contains("noseatbelt")) {
+            sendWarning(WarningType.SEATBELT_UNFASTENED)
         }
     }
 

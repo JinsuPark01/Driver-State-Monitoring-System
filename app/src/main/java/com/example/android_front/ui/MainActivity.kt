@@ -17,7 +17,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.android_front.R
 import com.example.android_front.adapter.DispatchPagerAdapter
 import com.example.android_front.adapter.NotificationAdapter
-import com.example.android_front.adapter.ScoreAdapter
 import com.example.android_front.api.RetrofitInstance
 import com.example.android_front.model.DispatchStatus
 import com.example.android_front.model.NotificationResponse
@@ -39,8 +38,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnSetting: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var indicatorLayout: LinearLayout
-    private lateinit var rvDrivingScores: RecyclerView
-    private lateinit var scoreAdapter: ScoreAdapter
+    private lateinit var tvDriverScoreAvg: TextView
+    private lateinit var tvBeforeDrive: LinearLayout
+    private lateinit var tvAfterDrive: LinearLayout
+    private lateinit var tvBestWarning: TextView
+    private lateinit var tvBest_warningCount: TextView
     private lateinit var ivAlarm: ImageView
     private lateinit var vRedDot: View
     private lateinit var tvNoDispatchMessage: TextView
@@ -55,10 +57,16 @@ class MainActivity : AppCompatActivity() {
         btnSetting = findViewById(R.id.btn_setting)
         viewPager = findViewById(R.id.viewPager)
         indicatorLayout = findViewById(R.id.indicator_layout)
-        rvDrivingScores = findViewById(R.id.rvDrivingScores)
         ivAlarm = findViewById(R.id.iv_alarm)
         vRedDot = findViewById(R.id.iv_newAlarm)
         tvNoDispatchMessage = findViewById(R.id.tvNoDispatch)
+        tvDriverScoreAvg = findViewById(R.id.tv_driver_score_avg)
+        tvBeforeDrive = findViewById(R.id.tv_before_drive)
+        tvAfterDrive = findViewById(R.id.tv_after_drive)
+        tvBestWarning = findViewById(R.id.tv_best_warning)
+        tvBest_warningCount = findViewById(R.id.tv_best_warning_count)
+
+
 
         // LiveData 관찰하여 빨간 점 상태 반영
         NotificationState.hasNewNotification.observe(this, Observer { hasNew ->
@@ -71,10 +79,6 @@ class MainActivity : AppCompatActivity() {
         ivAlarm.setOnClickListener {
             showNotificationPopup()
         }
-
-        // Score RecyclerView 세팅 (수평)
-        rvDrivingScores.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         btnMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))
@@ -101,9 +105,48 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val data: UserDetailResponse? = response.body()?.data
                         if (data != null) {
+
+                            // 1️⃣ 운행 점수 표시
+                            val drivingScore = data.payload.avgDrivingScore?.toInt() ?: 0
+                            tvDriverScoreAvg.text = "${drivingScore}점"
+
+                            // 2️⃣ 각 카운트 가져오기 (null-safe)
+                            val drowsiness = data.payload.avgDrowsinessCount ?: 0.0
+                            val acceleration = data.payload.avgAccelerationCount ?: 0.0
+                            val braking = data.payload.avgBrakingCount ?: 0.0
+                            val abnormal = data.payload.avgAbnormalCount ?: 0.0
+
+                            // 3️⃣ 운행 시작 여부 판단
+                            if (drivingScore == 100 &&
+                                drowsiness == 0.0 &&
+                                acceleration == 0.0 &&
+                                braking == 0.0 &&
+                                abnormal == 0.0) {
+                                tvBeforeDrive.visibility = View.VISIBLE
+                                tvAfterDrive.visibility = View.GONE
+                                tvDriverScoreAvg.text = "- 점"
+                            } else {
+                                tvBeforeDrive.visibility = View.GONE
+                                tvAfterDrive.visibility = View.VISIBLE
+
+                                // 4️⃣ 가장 높은 카운트 확인
+                                val maxCount = maxOf(drowsiness, acceleration, braking, abnormal)
+                                val bestWarningText = when (maxCount) {
+                                    drowsiness -> "졸음운전"
+                                    acceleration -> "급가속"
+                                    braking -> "급제동"
+                                    abnormal -> "이상행동"
+                                    else -> ""
+                                }
+
+                                // 5️⃣ UI 업데이트
+                                tvBestWarning.text = bestWarningText
+                                tvBest_warningCount.text = String.format("%.1f", maxCount)
+                            }
+
+                            // 6️⃣ 페이지 제목
                             tvPageTitle.text = "${data.username}님"
-                            scoreAdapter = ScoreAdapter(data)
-                            rvDrivingScores.adapter = scoreAdapter
+
                         } else {
                             Toast.makeText(
                                 this@MainActivity,
@@ -130,6 +173,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     /** 배차 리스트 조회 */
     private fun fetchDispatchList() {
@@ -189,7 +233,7 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful && response.body()?.success == true) {
                         val notifications: List<NotificationResponse> =
                             response.body()?.data ?: emptyList()
-                        val tvNoNotifications = view.findViewById<TextView>(R.id.tvNoNotifications)
+                        val tvNoNotifications = view.findViewById<LinearLayout>(R.id.tvNoNotifications)
 
                         if (notifications.isEmpty()) {
                             rvNotifications.visibility = View.GONE

@@ -63,7 +63,7 @@
                     android:id="@+id/tvViewMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="자세히 보기 →"
+                    android:text="금주 운행 기록 →"
                     android:fontFamily="@font/pretendard_medium"
                     android:textSize="14sp"
                     android:textColor="#888888" />
@@ -277,8 +277,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_drive_card_no_padding"
                 android:orientation="vertical"
-                android:gravity="center"
-                >
+                android:gravity="center">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

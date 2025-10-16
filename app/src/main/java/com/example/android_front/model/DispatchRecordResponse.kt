@@ -5,6 +5,8 @@ data class DispatchRecordResponse(
     val drowsinessCount: Int,
     val accelerationCount: Int,
     val brakingCount: Int,
-    val abnormalCount: Int,
+    val smokingCount: Int,
+    val seatbeltUnfastenedCount: Int,
+    val phoneUsageCount: Int,
     val drivingScore: Int
 )

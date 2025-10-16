@@ -1,5 +1,6 @@
 package com.example.android_front.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -58,6 +59,7 @@ class RecordActivity : AppCompatActivity() {
 
         // UI 연결
         val btnBack = findViewById<View>(R.id.btnBack)
+        val tvViewMore = findViewById<TextView>(R.id.tvViewMore)
         tvDrivingScore = findViewById(R.id.tv_circular_gauge_percentage)
         tvVehicleNumber = findViewById(R.id.tvVehicleNumber)
         tvRouteNumber = findViewById(R.id.tvRouteNumber)
@@ -79,6 +81,9 @@ class RecordActivity : AppCompatActivity() {
 
         // 뒤로가기 버튼
         btnBack.setOnClickListener { finish() }
+        tvViewMore.setOnClickListener {
+            startActivity(Intent(this, AllScoreActivity::class.java))
+        }
 
         // MapView 시작 (콜백 객체 미리 선언해서 전달)
         mapView.start(object : MapLifeCycleCallback() {
@@ -140,12 +145,15 @@ class RecordActivity : AppCompatActivity() {
                     val apiResponse = response.body()
                     if (response.isSuccessful && apiResponse != null && apiResponse.success && apiResponse.data != null) {
                         val record = apiResponse.data
+                        val abnormalCount = (record.smokingCount ?: 0) +
+                                (record.seatbeltUnfastenedCount ?: 0) +
+                                (record.phoneUsageCount ?: 0)
                         tvDrivingScore.text = "${record.drivingScore}점"
                         circularGauge.progress = record.drivingScore
                         tvSleep.text = "${record.drowsinessCount}회"
                         tvOverSpeed.text = "${record.accelerationCount}회"
                         tvUnderSpeed.text = "${record.brakingCount}회"
-                        tvAbnormal.text = "${record.abnormalCount}회"
+                        tvAbnormal.text = "${abnormalCount}회"
                     } else {
                         Toast.makeText(this@RecordActivity, apiResponse?.message ?: "기록 조회 실패", Toast.LENGTH_SHORT).show()
                     }
