@@ -160,7 +160,7 @@
                 android:paddingBottom="6dp"
                 android:weightSum="4">
                 <LinearLayout
-                    android:id="@+id/btn_schedul"
+                    android:id="@+id/btn_schedule"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

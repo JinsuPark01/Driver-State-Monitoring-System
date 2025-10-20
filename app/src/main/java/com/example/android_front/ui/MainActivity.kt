@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvViewMore: TextView
     private lateinit var btnMyPage: LinearLayout
     private lateinit var btnSetting: LinearLayout
+    private lateinit var btnSchedule: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var btnReserve: LinearLayout
     private lateinit var indicatorLayout: LinearLayout
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity() {
         tvViewMore = findViewById(R.id.tvViewMore)
         btnMyPage = findViewById(R.id.btn_myPage)
         btnSetting = findViewById(R.id.btn_setting)
+        btnSchedule = findViewById(R.id.btn_schedule)
         viewPager = findViewById(R.id.viewPager)
         btnReserve = findViewById(R.id.btnReserve)
         indicatorLayout = findViewById(R.id.indicator_layout)
@@ -109,6 +111,9 @@ class MainActivity : AppCompatActivity() {
         }
         btnReserve.setOnClickListener {
             showReservePopup()
+        }
+        btnSchedule.setOnClickListener {
+            startActivity(Intent(this, ScheduleActivity::class.java))
         }
         btnMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))

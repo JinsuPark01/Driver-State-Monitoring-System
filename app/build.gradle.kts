@@ -47,6 +47,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     //implementation("com.google.android.material:material:1.9.0")
 
     // Retrofit
