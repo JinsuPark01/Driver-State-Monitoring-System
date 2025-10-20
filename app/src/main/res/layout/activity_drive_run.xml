@@ -636,7 +636,7 @@
                 android:gravity="center"
                 android:padding="12dp"
                 android:text="운행 종료하기"
-                android:fontFamily="@font/pretendard_regular"
+                android:fontFamily="@font/pretendard_medium"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>

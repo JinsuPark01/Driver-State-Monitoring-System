@@ -1,0 +1,94 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="@drawable/bg_drive_card_no_padding">
+
+    <!-- 제목 영역 + 닫기 버튼 -->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvPopupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="알림 설정"
+            android:textSize="18sp"
+            android:fontFamily="@font/pretendard_bold"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:id="@+id/ivClosePopup"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_close"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="닫기"/>
+    </RelativeLayout>
+
+    <!-- 라디오 그룹 영역 (수직, 하나만 선택 가능) -->
+    <RadioGroup
+        android:id="@+id/rgNotificationTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card_all_rounded"
+        android:backgroundTint="#EEEEEE"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp">
+
+        <RadioButton
+            android:id="@+id/rbOneHour"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:fontFamily="@font/pretendard_medium"
+            app:buttonTint="@color/radio_selector"
+            android:text="1시간 전"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/rbThirtyMin"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            app:buttonTint="@color/radio_selector"
+            android:text="30분 전"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="12sp"/>
+
+        <RadioButton
+            android:id="@+id/rbTenMin"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            app:buttonTint="@color/radio_selector"
+            android:text="10분 전"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="12sp"/>
+        <RadioButton
+            android:id="@+id/rbNo"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            app:buttonTint="@color/radio_selector"
+            android:text="알림 없음"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="12sp"/>
+    </RadioGroup>
+
+    <!-- 확인 버튼 -->
+    <TextView
+        android:id="@+id/btnConfirmPopup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="확인"
+        android:fontFamily="@font/pretendard_medium"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
+</LinearLayout>

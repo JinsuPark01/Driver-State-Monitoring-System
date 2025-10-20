@@ -38,7 +38,9 @@ class DispatchEventAdapter(
             "급가속" -> ContextCompat.getColor(holder.itemView.context, R.color.over)
             "급제동" -> ContextCompat.getColor(holder.itemView.context, R.color.under)
             "졸음" -> ContextCompat.getColor(holder.itemView.context, R.color.drowsiness)
-            "이상행동" -> ContextCompat.getColor(holder.itemView.context, R.color.abnormal)
+            "담배" -> ContextCompat.getColor(holder.itemView.context, R.color.abnormal)
+            "벨트" -> ContextCompat.getColor(holder.itemView.context, R.color.abnormal)
+            "전화" -> ContextCompat.getColor(holder.itemView.context, R.color.abnormal)
             else -> ContextCompat.getColor(holder.itemView.context, R.color.gray_light)
         }
         bg?.setTint(color)

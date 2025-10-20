@@ -7,7 +7,7 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
     <!-- Login 화면 테마 -->
-    <style name="Theme.Androidfront.Login">
+    <style name="Theme.Androidfront.White">
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>

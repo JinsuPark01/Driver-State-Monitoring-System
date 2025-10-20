@@ -15,10 +15,10 @@
             android:id="@+id/tvPopupTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="알림"
+            android:text="안내"
             android:textSize="18sp"
             android:fontFamily="@font/pretendard_bold"
-            android:layout_centerInParent="true"/>
+            android:layout_alignParentStart="true"/>
 
         <ImageView
             android:id="@+id/ivClosePopup"

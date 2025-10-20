@@ -33,7 +33,7 @@
             android:name=".ui.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Androidfront.Login">
+            android:theme="@style/Theme.Androidfront.White">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.SignUpActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.Login"/>
+        <activity android:name=".ui.SignUpActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.White"/>
         <activity android:name=".ui.MainActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.Main" />
         <activity android:name=".ui.SettingActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.RunActivity" android:exported="true" android:screenOrientation="portrait" />

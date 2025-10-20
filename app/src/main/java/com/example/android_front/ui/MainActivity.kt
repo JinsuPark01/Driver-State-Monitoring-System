@@ -1,16 +1,25 @@
 //메인
 package com.example.android_front.ui
 
+import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.RadioGroup
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -28,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.Observer
+import com.example.android_front.adapter.BannerAdapter
 import com.example.android_front.model.DispatchDetailResponse
 
 class MainActivity : AppCompatActivity() {
@@ -37,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnMyPage: LinearLayout
     private lateinit var btnSetting: LinearLayout
     private lateinit var viewPager: ViewPager2
+    private lateinit var btnReserve: LinearLayout
     private lateinit var indicatorLayout: LinearLayout
     private lateinit var tvDriverScoreAvg: TextView
     private lateinit var tvBeforeDrive: LinearLayout
@@ -47,6 +58,22 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vRedDot: View
     private lateinit var tvNoDispatchMessage: TextView
 
+    private lateinit var bannerViewPager: ViewPager2
+    private lateinit var bannerAdapter: BannerAdapter
+    private val bannerList = listOf(
+        R.drawable.banner_1,
+        R.drawable.banner_2,
+        R.drawable.banner_3
+    )
+    private val bannerHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val bannerRunnable = object : Runnable {
+        override fun run() {
+            val nextItem = (bannerViewPager.currentItem + 1) % bannerAdapter.itemCount
+            bannerViewPager.setCurrentItem(nextItem, true)
+            bannerHandler.postDelayed(this, 5000) // 5초마다 자동 슬라이드
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -56,6 +83,7 @@ class MainActivity : AppCompatActivity() {
         btnMyPage = findViewById(R.id.btn_myPage)
         btnSetting = findViewById(R.id.btn_setting)
         viewPager = findViewById(R.id.viewPager)
+        btnReserve = findViewById(R.id.btnReserve)
         indicatorLayout = findViewById(R.id.indicator_layout)
         ivAlarm = findViewById(R.id.iv_alarm)
         vRedDot = findViewById(R.id.iv_newAlarm)
@@ -75,25 +103,39 @@ class MainActivity : AppCompatActivity() {
             if (hasNew) { fetchDispatchList() } // 새로운 알림이 올 때마다 배차도 최신화
         })
 
-        // 알람 버튼 클릭
+        // 안내 버튼 클릭
         ivAlarm.setOnClickListener {
             showNotificationPopup()
         }
-
+        btnReserve.setOnClickListener {
+            showReservePopup()
+        }
         btnMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))
         }
-
         btnSetting.setOnClickListener {
             startActivity(Intent(this, SettingActivity::class.java))
         }
-
         tvViewMore.setOnClickListener {
             startActivity(Intent(this, AllScoreActivity::class.java))
         }
 
         fetchUserDetail()
         fetchDispatchList()
+
+        // 자동 슬라이드 시작
+        bannerViewPager = findViewById(R.id.bannerViewPager)
+        bannerAdapter = BannerAdapter(bannerList)
+        bannerViewPager.adapter = bannerAdapter
+        // 페이지 변경시 핸들러 초기화
+        bannerViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+            bannerHandler.removeCallbacks(bannerRunnable)
+            bannerHandler.postDelayed(bannerRunnable, 5000)
+            }
+        })
+        // 자동 슬라이드 시작
+        bannerHandler.postDelayed(bannerRunnable, 5000)
     }
 
     /** 유저 정보 및 평균 점수 조회 */
@@ -290,6 +332,87 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun showReservePopup() {
+        val dialog = Dialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.popup_reserve, null)
+        dialog.setContentView(view)
+
+        val width = (resources.displayMetrics.widthPixels * 0.7).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        // SharedPreferences 불러오기
+        val prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val savedTime = prefs.getInt("reserve_time", -1) // -1 = 알림 없음
+
+        // 라디오 버튼 가져오기
+        val rgNotificationTime = view.findViewById<RadioGroup>(R.id.rgNotificationTime)
+        val rbOneHour = view.findViewById<RadioButton>(R.id.rbOneHour)
+        val rbThirtyMin = view.findViewById<RadioButton>(R.id.rbThirtyMin)
+        val rbTenMin = view.findViewById<RadioButton>(R.id.rbTenMin)
+        val rbNo = view.findViewById<RadioButton>(R.id.rbNo)
+
+        // 초기 체크 상태에 따라 폰트 설정
+        fun setInitialFont() {
+            rbOneHour.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+            rbThirtyMin.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+            rbTenMin.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+            rbNo.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+
+            when(savedTime) {
+                60 -> rbOneHour.apply { isChecked = true; typeface = ResourcesCompat.getFont(this@MainActivity, R.font.pretendard_bold) }
+                30 -> rbThirtyMin.apply { isChecked = true; typeface = ResourcesCompat.getFont(this@MainActivity, R.font.pretendard_bold) }
+                10 -> rbTenMin.apply { isChecked = true; typeface = ResourcesCompat.getFont(this@MainActivity, R.font.pretendard_bold) }
+                -1 -> rbNo.apply { isChecked = true; typeface = ResourcesCompat.getFont(this@MainActivity, R.font.pretendard_bold) }
+            }
+        }
+        setInitialFont()
+
+        // 라디오 버튼 체크 변경 리스너
+        rgNotificationTime.setOnCheckedChangeListener { _, checkedId ->
+            // 모든 라디오 버튼 기본 폰트로
+            rbOneHour.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+            rbThirtyMin.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+            rbTenMin.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+            rbNo.typeface = ResourcesCompat.getFont(this, R.font.pretendard_medium)
+
+            // 선택된 버튼만 bold
+            val selectedRb = view.findViewById<RadioButton>(checkedId)
+            selectedRb.typeface = ResourcesCompat.getFont(this, R.font.pretendard_bold)
+        }
+
+        // 닫기 버튼
+        val ivClose = view.findViewById<ImageView>(R.id.ivClosePopup)
+        ivClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // 확인 버튼
+        val btnConfirm = view.findViewById<TextView>(R.id.btnConfirmPopup)
+        btnConfirm.setOnClickListener {
+            val selectedTime = when (rgNotificationTime.checkedRadioButtonId) {
+                R.id.rbOneHour -> 60
+                R.id.rbThirtyMin -> 30
+                R.id.rbTenMin -> 10
+                else -> -1 // 알림 없음
+            }
+
+            // SharedPreferences에 저장
+            prefs.edit().putInt("reserve_time", selectedTime).apply()
+
+            Toast.makeText(this, "알림이 설정되었습니다.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+    }
+
+
+
+
     /** ViewPager2 세팅 */
     private fun setupViewPager(dispatchList: List<DispatchDetailResponse>) {
         viewPager.adapter = DispatchPagerAdapter(dispatchList) { dispatch ->
@@ -440,5 +563,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        bannerHandler.removeCallbacks(bannerRunnable)
     }
 }
