@@ -42,14 +42,21 @@
         </activity>
 
         <activity android:name=".ui.SignUpActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.White"/>
+
         <activity android:name=".ui.MainActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.Main" />
-        <activity android:name=".ui.SettingActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.RunActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.RecordActivity" android:exported="true" android:screenOrientation="portrait" />
+
         <activity android:name=".ui.ScheduleActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.MyPageActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.Main" />
+        <activity android:name=".ui.MonitorActivity" android:exported="true" android:screenOrientation="portrait" />
+        <activity android:name=".ui.WeatherActivity" android:exported="true" android:screenOrientation="portrait" />
+        <activity android:name=".ui.SettingActivity" android:exported="true" android:screenOrientation="portrait" />
+
         <activity android:name=".ui.AllScoreActivity" android:exported="true" android:screenOrientation="portrait" />
+
         <activity android:name=".test.KeyHashActivity" android:exported="true" android:screenOrientation="portrait" />
+
 
         <service
             android:name=".service.SocketService"
