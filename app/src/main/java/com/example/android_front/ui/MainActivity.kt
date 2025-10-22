@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnMyPage: LinearLayout
     private lateinit var btnSetting: LinearLayout
     private lateinit var btnSchedule: LinearLayout
+    private lateinit var btnMonitor: LinearLayout
+    private lateinit var btnWeather: LinearLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var btnReserve: LinearLayout
     private lateinit var indicatorLayout: LinearLayout
@@ -83,6 +85,8 @@ class MainActivity : AppCompatActivity() {
         tvViewMore = findViewById(R.id.tvViewMore)
         btnMyPage = findViewById(R.id.btn_myPage)
         btnSetting = findViewById(R.id.btn_setting)
+        btnMonitor = findViewById(R.id.btn_monitoring)
+        btnWeather = findViewById(R.id.btn_weather)
         btnSchedule = findViewById(R.id.btn_schedule)
         viewPager = findViewById(R.id.viewPager)
         btnReserve = findViewById(R.id.btnReserve)
@@ -115,8 +119,14 @@ class MainActivity : AppCompatActivity() {
         btnSchedule.setOnClickListener {
             startActivity(Intent(this, ScheduleActivity::class.java))
         }
+        btnMonitor.setOnClickListener {
+            startActivity(Intent(this, MonitorActivity::class.java))
+        }
         btnMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))
+        }
+        btnWeather.setOnClickListener {
+            startActivity(Intent(this, WeatherActivity::class.java))
         }
         btnSetting.setOnClickListener {
             startActivity(Intent(this, SettingActivity::class.java))
@@ -161,14 +171,16 @@ class MainActivity : AppCompatActivity() {
                             val drowsiness = data.payload.avgDrowsinessCount ?: 0.0
                             val acceleration = data.payload.avgAccelerationCount ?: 0.0
                             val braking = data.payload.avgBrakingCount ?: 0.0
-                            val abnormal = data.payload.avgAbnormalCount ?: 0.0
+                            val smoke = data.payload.avgSmokingCount ?: 0.0
+                            val seatbelt = data.payload.avgSeatbeltUnfastenedCount ?: 0.0
+                            val phone = data.payload.avgPhoneUsageCount ?: 0.0
 
                             // 3️⃣ 운행 시작 여부 판단
                             if (drivingScore == 100 &&
                                 drowsiness == 0.0 &&
                                 acceleration == 0.0 &&
                                 braking == 0.0 &&
-                                abnormal == 0.0) {
+                                smoke+seatbelt+phone == 0.0) {
                                 tvBeforeDrive.visibility = View.VISIBLE
                                 tvAfterDrive.visibility = View.GONE
                                 tvDriverScoreAvg.text = "- 점"
@@ -177,12 +189,12 @@ class MainActivity : AppCompatActivity() {
                                 tvAfterDrive.visibility = View.VISIBLE
 
                                 // 4️⃣ 가장 높은 카운트 확인
-                                val maxCount = maxOf(drowsiness, acceleration, braking, abnormal)
+                                val maxCount = maxOf(drowsiness, acceleration, braking, smoke+seatbelt+phone)
                                 val bestWarningText = when (maxCount) {
                                     drowsiness -> "졸음운전"
                                     acceleration -> "급가속"
                                     braking -> "급제동"
-                                    abnormal -> "이상행동"
+                                    smoke+seatbelt+phone -> "이상행동"
                                     else -> ""
                                 }
 
@@ -232,18 +244,14 @@ class MainActivity : AppCompatActivity() {
                 )
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        val body = response.body()
-                        if (body?.success == true && body.data != null) {
-                            tvNoDispatchMessage.visibility = View.GONE
-                            setupViewPager(body.data)
-                        } else {
-                            Toast.makeText(
-                                this@MainActivity,
-                                body?.message ?: "배차 정보를 불러오지 못했습니다.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                        val apiBody = response.body()
+                        val dispatchList: List<DispatchDetailResponse> = apiBody?.data ?: emptyList()
+                        viewPager.visibility = View.VISIBLE
+                        tvNoDispatchMessage.visibility = View.GONE
+                        setupViewPager(dispatchList)
                     } else {
+                        viewPager.visibility = View.GONE
+                        tvNoDispatchMessage.visibility = View.VISIBLE
                         Toast.makeText(
                             this@MainActivity,
                             "배차 정보를 불러오지 못했습니다.",
@@ -253,6 +261,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    viewPager.visibility = View.GONE
                     tvNoDispatchMessage.visibility = View.VISIBLE
                     Toast.makeText(
                         this@MainActivity,

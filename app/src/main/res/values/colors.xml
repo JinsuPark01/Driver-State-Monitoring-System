@@ -9,8 +9,8 @@
     <color name="gray">#666666</color>
     <color name="gray_light">#AAAAAA</color>
 
+    <color name="drowsiness">#449fd5</color>
     <color name="over">#498bd0</color>
     <color name="under">#4f71c8</color>
-    <color name="drowsiness">#449fd5</color>
     <color name="abnormal">#555cc1</color>
 </resources>

@@ -7,6 +7,8 @@ data class UserDetailPayload(
     val avgDrowsinessCount: Double?,
     val avgAccelerationCount: Double?,
     val avgBrakingCount: Double?,
-    val avgAbnormalCount: Double?,
+    val avgSmokingCount: Double?,
+    val avgSeatbeltUnfastenedCount: Double?,
+    val avgPhoneUsageCount: Double?,
     val avgDrivingScore: Double?
 )

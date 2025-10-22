@@ -47,7 +47,7 @@
         <activity android:name=".ui.RunActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.RecordActivity" android:exported="true" android:screenOrientation="portrait" />
 
-        <activity android:name=".ui.ScheduleActivity" android:exported="true" android:screenOrientation="portrait" />
+        <activity android:name=".ui.ScheduleActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.Main"/>
         <activity android:name=".ui.MyPageActivity" android:exported="true" android:screenOrientation="portrait" android:theme="@style/Theme.Androidfront.Main" />
         <activity android:name=".ui.MonitorActivity" android:exported="true" android:screenOrientation="portrait" />
         <activity android:name=".ui.WeatherActivity" android:exported="true" android:screenOrientation="portrait" />

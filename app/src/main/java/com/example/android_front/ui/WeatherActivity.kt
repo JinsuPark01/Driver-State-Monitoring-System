@@ -10,7 +10,7 @@ class WeatherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_monitor)
+        setContentView(R.layout.activity_weather)
 
         // View 연결
         val btnBack = findViewById<View>(R.id.btnBack)

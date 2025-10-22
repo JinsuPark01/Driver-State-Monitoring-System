@@ -6,15 +6,25 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android_front.R
+import com.example.android_front.adapter.NotificationAdapter
 import com.example.android_front.api.RetrofitInstance
 import com.example.android_front.model.DispatchStatus
+import com.example.android_front.model.NotificationResponse
+import com.example.android_front.websocket.NotificationState
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +33,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 class ScheduleActivity : AppCompatActivity() {
-
+    private lateinit var ivAlarm: ImageView
+    private lateinit var vRedDot: View
     private lateinit var weeklyView: WeeklyDispatchView
     private lateinit var tvDate: TextView
 
@@ -38,6 +49,12 @@ class ScheduleActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             finish()
         }
+        vRedDot = findViewById(R.id.iv_newAlarm)
+        ivAlarm = findViewById(R.id.iv_alarm)
+
+        ivAlarm.setOnClickListener {
+            showNotificationPopup()
+        }
         weeklyView = findViewById(R.id.weeklyDispatchView)
         tvDate = findViewById(R.id.tv_date)
 
@@ -50,6 +67,14 @@ class ScheduleActivity : AppCompatActivity() {
 
         updateDateText()
         fetchDispatchList(currentWeekStart, currentWeekEnd)
+
+        // 🔹 여기서 알림 LiveData 관찰
+        NotificationState.hasNewNotification.observe(this, { hasNew ->
+            if (hasNew) {
+                vRedDot.visibility = if (hasNew) View.VISIBLE else View.INVISIBLE
+                fetchDispatchList(currentWeekStart, currentWeekEnd)
+            }
+        })
     }
 
     private fun changeWeek(offset: Long) {
@@ -131,7 +156,78 @@ class ScheduleActivity : AppCompatActivity() {
             }
         }
     }
+    /** 알림 BottomSheetDialog 띄우기 */
+    private fun showNotificationPopup() {
+        val dialog = BottomSheetDialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.popup_notifications, null)
+        dialog.setContentView(view)
 
+        val rvNotifications = view.findViewById<RecyclerView>(R.id.rvNotifications)
+        rvNotifications.layoutManager = LinearLayoutManager(this)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.notificationApi.getMyNotifications()
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        val notifications: List<NotificationResponse> =
+                            response.body()?.data ?: emptyList()
+                        val tvNoNotifications = view.findViewById<LinearLayout>(R.id.tvNoNotifications)
+
+                        if (notifications.isEmpty()) {
+                            rvNotifications.visibility = View.GONE
+                            tvNoNotifications.visibility = View.VISIBLE
+                        } else {
+                            rvNotifications.visibility = View.VISIBLE
+                            tvNoNotifications.visibility = View.GONE
+                            val adapter = NotificationAdapter(notifications)
+                            rvNotifications.adapter = adapter
+                        }
+
+                        // X 버튼 클릭 처리
+                        val ivClose = view.findViewById<ImageView>(R.id.ivClosePopup)
+                        ivClose.setOnClickListener {
+                            dialog.dismiss()
+                        }
+
+                        // 모든 닫힘 이벤트에 동일한 동작 적용
+                        dialog.setOnDismissListener {
+                            notifications.filter { !it.isRead }.forEach { notif ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+                                        RetrofitInstance.notificationApi.markNotificationRead(notif.notificationId)
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                            }
+                            NotificationState.hideRedDot()
+                        }
+
+                        // 다이얼로그 닫힘 설정
+                        dialog.setCancelable(true)
+                        dialog.setCanceledOnTouchOutside(true)
+                    } else {
+                        Toast.makeText(
+                            this@ScheduleActivity,
+                            response.body()?.message ?: "알림 조회 실패",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@ScheduleActivity,
+                        "네트워크 오류: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        dialog.show()
+    }
 }
 
 // ================== 데이터 클래스 ==================
@@ -289,8 +385,8 @@ class WeeklyDispatchView(context: android.content.Context, attrs: AttributeSet?)
 
         // 박스 색상 결정
         paint.color = when(status) {
-            DispatchStatus.SCHEDULED.displayName -> ContextCompat.getColor(context, R.color.main)
-            DispatchStatus.COMPLETED.displayName -> Color.parseColor("#4CAF50") // 녹색
+            DispatchStatus.SCHEDULED.displayName -> Color.parseColor("#91B3E8")
+            DispatchStatus.COMPLETED.displayName -> Color.parseColor("#8FD19E")
             else -> ContextCompat.getColor(context, R.color.main)
         }
         paint.style = Paint.Style.FILL
@@ -333,7 +429,7 @@ class WeeklyDispatchView(context: android.content.Context, attrs: AttributeSet?)
 
         paint.color = Color.parseColor("#F5F5F5")
         paint.style = Paint.Style.FILL
-        canvas.drawRect(left, headerHeight, right, headerHeight + (endHour - startHour) * hourHeight, paint)
+        canvas.drawRect(left, headerHeight, right, headerHeight + (endHour - startHour) * hourHeight -resources.displayMetrics.density, paint)
     }
 
     // ----------------- 높이 측정 (ScrollView용) -----------------

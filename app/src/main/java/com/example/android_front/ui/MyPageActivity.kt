@@ -174,9 +174,12 @@ class MyPageActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val apiBody = response.body()
                         val dispatchList: List<DispatchDetailResponse> = apiBody?.data ?: emptyList()
+                        viewPager.visibility = View.VISIBLE
                         tvNoDispatchMessage.visibility = View.GONE
                         setupViewPager(dispatchList)
                     } else {
+                        viewPager.visibility = View.GONE
+                        tvNoDispatchMessage.visibility = View.VISIBLE
                         Toast.makeText(
                             this@MyPageActivity,
                             "배차 정보를 불러오지 못했습니다.",
@@ -186,6 +189,7 @@ class MyPageActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    viewPager.visibility = View.GONE
                     tvNoDispatchMessage.visibility = View.VISIBLE
                     Toast.makeText(
                         this@MyPageActivity,
