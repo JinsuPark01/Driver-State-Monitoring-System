@@ -22,6 +22,7 @@ import com.kakao.vectormap.label.LabelLayer
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.label.LabelStyles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -231,33 +232,32 @@ class RecordActivity : AppCompatActivity() {
     /** 클릭한 이벤트 지도에 라벨 표시 */
     private fun showEventOnMap(event: DispatchEventsResponse) {
         val map = kakaoMap ?: return
-        val layer = labelLayer ?: return
 
-        val lat = event.latitude
-        val lon = event.longitude
-        if (lat == null || lon == null) {
-            Toast.makeText(this, "위치 정보가 없습니다.", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val lat = event.latitude ?: return
+        val lon = event.longitude ?: return
 
         val target = LatLng.from(lat, lon)
 
         // 카메라 이동
-        val cameraUpdate = CameraUpdateFactory.newCenterPosition(target)
-        map.moveCamera(cameraUpdate)
+        map.moveCamera(CameraUpdateFactory.newCenterPosition(target))
+
+        // LabelStyles 생성
+        val styles = map.labelManager!!.addLabelStyles(
+            LabelStyles.from(LabelStyle.from(R.drawable.ic_pin))
+        )
+
+        // LabelOptions 생성
+        val options = LabelOptions.from(target)
+            .setStyles(styles)
+
+        // LabelLayer 가져오기
+        val layer = map.labelManager!!.layer!!
 
         // 기존 라벨 제거
         layer.removeAll()
 
-        // drawable 아이콘을 LabelStyle로 변환
-        val iconStyle = LabelStyle.from(R.drawable.ic_pin)
-
-        // 라벨 옵션 생성 (텍스트 없이 아이콘만)
-        val labelOptions = LabelOptions.from(target)
-            .setStyles(iconStyle)
-
-        // 지도에 라벨 추가
-        layer.addLabel(labelOptions)
+        // Label 추가
+        layer.addLabel(options)
     }
     override fun onResume() {
         super.onResume()

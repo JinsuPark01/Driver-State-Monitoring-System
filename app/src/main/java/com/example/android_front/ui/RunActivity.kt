@@ -43,6 +43,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import android.media.AudioManager
+import android.media.ToneGenerator
 
 class RunActivity : AppCompatActivity() {
 
@@ -79,6 +81,12 @@ class RunActivity : AppCompatActivity() {
 
     private var dispatchId: Long = -1
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    //경고 UI 갱신용
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val resetRunnables = mutableMapOf<TextView, Runnable>()
+    private var overlayResetRunnable: Runnable? = null
+    //경고음 발생
+    private val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, 100)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -422,47 +430,35 @@ class RunActivity : AppCompatActivity() {
     }
 
     private fun onDrowsinessOrAbnormalBehaviorDetected(abnormalLabels: List<String>) {
-        // 색상 정의
         val green = ContextCompat.getColor(this, android.R.color.holo_green_dark)
         val red = ContextCompat.getColor(this, android.R.color.holo_red_dark)
 
-        // 졸음 상태
-        if (abnormalLabels.contains("DROWSINESS")) {
-            tvStatusDrowsiness.text = "비정상"
-            tvStatusDrowsiness.setTextColor(red)
-        } else {
-            tvStatusDrowsiness.text = "정상"
-            tvStatusDrowsiness.setTextColor(green)
+        // 내부 함수: 상태 업데이트 + 2초 유지
+        fun updateStatus(textView: TextView, isAbnormal: Boolean) {
+            if (isAbnormal) {
+                // 비정상 표시
+                textView.text = "비정상"
+                textView.setTextColor(red)
+
+                // 기존 타이머 제거 후 다시 설정
+                resetRunnables[textView]?.let { handler.removeCallbacks(it) }
+                val runnable = Runnable {
+                    textView.text = "정상"
+                    textView.setTextColor(green)
+                }
+                resetRunnables[textView] = runnable
+                handler.postDelayed(runnable, 2000)
+            }
         }
 
-        // 담배 상태
-        if (abnormalLabels.contains("cigarette")) {
-            tvStatusCigarette.text = "비정상"
-            tvStatusCigarette.setTextColor(red)
-        } else {
-            tvStatusCigarette.text = "정상"
-            tvStatusCigarette.setTextColor(green)
-        }
+        // 상태별 갱신
+        updateStatus(tvStatusDrowsiness, abnormalLabels.contains("DROWSINESS"))
+        updateStatus(tvStatusCigarette, abnormalLabels.contains("cigarette"))
+        updateStatus(tvStatusPhone, abnormalLabels.contains("phone"))
+        updateStatus(tvStatusSeatbelt, abnormalLabels.contains("noseatbelt"))
 
-        // 휴대폰 상태
-        if (abnormalLabels.contains("phone")) {
-            tvStatusPhone.text = "비정상"
-            tvStatusPhone.setTextColor(red)
-        } else {
-            tvStatusPhone.text = "정상"
-            tvStatusPhone.setTextColor(green)
-        }
 
-        // 안전벨트 상태
-        if (abnormalLabels.contains("noseatbelt")) {
-            tvStatusSeatbelt.text = "비정상"
-            tvStatusSeatbelt.setTextColor(red)
-        } else {
-            tvStatusSeatbelt.text = "정상"
-            tvStatusSeatbelt.setTextColor(green)
-        }
-
-        // tvOverlay 업데이트
+        // tvOverlay 표시 + 2초 유지
         if (abnormalLabels.isNotEmpty()) {
             if (tvOverlay.visibility != View.VISIBLE) {
                 tvOverlay.visibility = View.VISIBLE
@@ -472,18 +468,23 @@ class RunActivity : AppCompatActivity() {
                     .setDuration(500)
                     .setListener(null)
             }
-        } else {
-            if (tvOverlay.visibility == View.VISIBLE) {
+            // 🔊 경고음 재생
+            playAlertSound()
+
+            // 유지 타이머 갱신
+            overlayResetRunnable?.let { handler.removeCallbacks(it) }
+            overlayResetRunnable = Runnable {
                 tvOverlay.animate()
                     .alpha(0f)
-                    .setDuration(500)
+                    .setDuration(1000)
                     .withEndAction {
                         tvOverlay.visibility = View.GONE
                     }
             }
+            handler.postDelayed(overlayResetRunnable!!, 2000)
         }
 
-        // 경고 전송
+        // 경고 전송 (원래 로직 그대로)
         if (abnormalLabels.contains("DROWSINESS")) {
             sendWarning(WarningType.DROWSINESS)
         }
@@ -498,6 +499,9 @@ class RunActivity : AppCompatActivity() {
         }
     }
 
+    private fun playAlertSound() {
+        toneGen.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 500)
+    }
 
     private fun sendDrivingFinish() {
         lifecycleScope.launch(Dispatchers.IO) {

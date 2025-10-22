@@ -325,7 +325,7 @@
                         android:layout_marginTop="4dp"
                         android:text="정상"
                         android:fontFamily="@font/pretendard_semibold"
-                        android:textColor="@android:color/white"
+                        android:textColor="@android:color/holo_green_dark"
                         android:textSize="18sp" />
                 </LinearLayout>
                 <View
@@ -356,7 +356,7 @@
                         android:text="정상"
                         android:fontFamily="@font/pretendard_semibold"
                         android:layout_marginTop="4dp"
-                        android:textColor="@android:color/white"
+                        android:textColor="@android:color/holo_green_dark"
                         android:textSize="18sp" />
                 </LinearLayout>
                 <View
@@ -387,7 +387,7 @@
                         android:text="정상"
                         android:fontFamily="@font/pretendard_semibold"
                         android:layout_marginTop="4dp"
-                        android:textColor="@android:color/white"
+                        android:textColor="@android:color/holo_green_dark"
                         android:textSize="18sp" />
                 </LinearLayout>
                 <View
@@ -418,7 +418,7 @@
                         android:text="정상"
                         android:fontFamily="@font/pretendard_semibold"
                         android:layout_marginTop="4dp"
-                        android:textColor="@android:color/white"
+                        android:textColor="@android:color/holo_green_dark"
                         android:textSize="18sp" />
                 </LinearLayout>
             </LinearLayout>
