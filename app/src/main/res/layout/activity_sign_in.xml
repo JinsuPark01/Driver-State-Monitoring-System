@@ -206,7 +206,7 @@
         android:fontFamily="@font/pretendard_medium"
         android:textAllCaps="false"
         app:backgroundTint="#4C7DCC"
-        app:cornerRadius="28dp"
+        app:cornerRadius="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

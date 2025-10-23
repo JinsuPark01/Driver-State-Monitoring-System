@@ -186,7 +186,7 @@
                 android:fontFamily="@font/pretendard_medium"
                 android:textAllCaps="false"
                 app:backgroundTint="@color/main"
-                app:cornerRadius="28dp"/>
+                app:cornerRadius="24dp"/>
 
         </LinearLayout>
     </LinearLayout>
