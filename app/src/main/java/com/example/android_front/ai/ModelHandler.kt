@@ -40,15 +40,26 @@ object ModelHandler {
     private val labels       = mutableMapOf<ModelType, List<String>>()
     private var initialized  = false
 
-    // --- Drowsiness 정책 (간단) ---
+    // --- 공통/YOLO 입력 크기 ---
     private const val YOLO_IN = 640
     private const val CLF_IN  = 224
+
+    // --- Face YOLO / 공통 NMS 파라미터 ---
     private const val YOLO_CONF = 0.25f
     private const val YOLO_IOU  = 0.45f
     private const val YOLO_TOPK = 50
-    private const val DROWSY_TH = 0.6f
-    private const val DROWSY_MIN_FRAMES = 10
+
+    // --- Drowsiness 정책 ---
+    private const val DROWSY_TH = 0.9f
+    private const val DROWSY_MIN_FRAMES = 3
     private val drowsyWindow: Queue<Int> = LinkedList()
+
+    // --- Seatbelt(새 모델) 정책 ---
+    private const val SB_CONF = 0.35f     // obj 임계값
+    private const val SB_IOU  = 0.45f
+    private const val SB_TOPK = 100
+    private const val SEATBELT_MIN_MISS_FRAMES = 7  // 연속 미탐지 10프레임 → 경고
+    private var seatbeltMissStreak = 0
 
     // -----------------------------------------------------
     // 🔹 초기화
@@ -56,10 +67,12 @@ object ModelHandler {
     fun init(context: Context) {
         if (initialized) return
         try {
-            // 기존 3종 그대로
+            // 기존 3종 그대로 (담배/폰은 기존 파서 사용)
             loadModel(context, ModelType.CIGARETTE, "cigarette_best_float16.tflite", "cigarette_best_labels.txt")
             loadModel(context, ModelType.PHONE,     "phone_float16.tflite",         "phone_labels.txt")
-            loadModel(context, ModelType.SEATBELT,  "seatbelt_best_float16.tflite", "seatbelt_best_labels.txt")
+            // ⚠️ seatbelt는 새 YOLO(1×5×8400) 모델 -> label 파일 없음
+            loadModel(context, ModelType.SEATBELT,  "seatbelt_best_float16.tflite", null)
+
             // 얼굴 + 졸음
             loadModel(context, ModelType.FACE,       "yolov8n-face_float32.tflite", null)
             loadModel(context, ModelType.DROWSINESS, "mobilenetv2_drowsiness_optimized.tflite", null)
@@ -104,12 +117,12 @@ object ModelHandler {
     }
 
     // -----------------------------------------------------
-    // 🔹 (구) 3종 감지: 기존 placeholder 유지
+    // 🔹 (구) 3종 감지: 기존 placeholder 유지 (담배/폰에서만 사용)
     // -----------------------------------------------------
     private fun runModel(bitmap: Bitmap, modelType: ModelType): List<DetectionResult> {
         val t = interpreters[modelType] ?: return emptyList()
         val labs = labels[modelType] ?: return emptyList()
-        val input = toNHWC_RGB(bitmap, 640)
+        val input = toNHWC_RGB(bitmap, YOLO_IN)
         val out = Array(1) { Array(300) { FloatArray(6) } } // 기존 포맷 가정
         t.run(input, out)
         return parseOutputs(out, labs)
@@ -140,7 +153,6 @@ object ModelHandler {
     private fun detectFaces(frame: Bitmap): List<RectF> {
         val t = interpreters[ModelType.FACE] ?: return emptyList()
 
-        // letterbox
         val (inputBmp, scale, padX, padY) = letterbox(frame, YOLO_IN, YOLO_IN)
         val input = toNHWC_RGB(inputBmp, YOLO_IN)
 
@@ -154,37 +166,35 @@ object ModelHandler {
             return emptyList()
         }
 
+        val boxes = ArrayList<RectF>()
+        val scores = ArrayList<Float>()
+
         if (cFirst) {
             val out = Array(1) { Array(20) { FloatArray(N) } }
             t.run(input, out)
-            val boxes = ArrayList<RectF>()
-            val scores = ArrayList<Float>()
             for (i in 0 until N) {
                 val x = out[0][0][i]; val y = out[0][1][i]
                 val w = out[0][2][i]; val h = out[0][3][i]
                 val obj = out[0][4][i]
                 addDet(frame, x, y, w, h, obj, scale, padX, padY, boxes, scores)
             }
-            if (boxes.isEmpty()) return emptyList()
-            val keep = nms(boxes, scores.toFloatArray(), YOLO_IOU, YOLO_TOPK)
-            return keep.map { boxes[it] }
         } else {
             val out = Array(1) { Array(N) { FloatArray(20) } }
             t.run(input, out)
-            val boxes = ArrayList<RectF>()
-            val scores = ArrayList<Float>()
             for (i in 0 until N) {
                 val v = out[0][i]
                 val x = v[0]; val y = v[1]; val w = v[2]; val h = v[3]
                 val obj = v[4]
                 addDet(frame, x, y, w, h, obj, scale, padX, padY, boxes, scores)
             }
-            if (boxes.isEmpty()) return emptyList()
-            val keep = nms(boxes, scores.toFloatArray(), YOLO_IOU, YOLO_TOPK)
-            return keep.map { boxes[it] }
         }
+
+        if (boxes.isEmpty()) return emptyList()
+        val keep = nms(boxes, scores.toFloatArray(), YOLO_IOU, YOLO_TOPK)
+        return keep.map { boxes[it] }
     }
 
+    // 공용: YOLO(cx,cy,w,h in 0~1) → 원본 좌표 변환 & 임계값 필터 (얼굴용)
     private fun addDet(
         src: Bitmap,
         x: Float, y: Float, w: Float, h: Float, obj: Float,
@@ -205,11 +215,81 @@ object ModelHandler {
     }
 
     // -----------------------------------------------------
-    // 🔹 졸음 분류(간단): DB+DD ≥ 0.6, 연속 15프레임
+    // 🔹 Seatbelt(새 모델) 디코더: [1,5,8400] 또는 [1,8400,5]
+    //     - 단일 클래스 obj → 박스가 하나라도 나오면 "벨트 감지됨"
+    //     - 박스 “미탐지”가 연속 10프레임이면 noseatbelt 이벤트
+    // -----------------------------------------------------
+    private fun detectSeatbeltBoxes(src: Bitmap): List<RectF> {
+        val t = interpreters[ModelType.SEATBELT] ?: return emptyList()
+
+        val (inputBmp, scale, padX, padY) = letterbox(src, YOLO_IN, YOLO_IN)
+        val input = toNHWC_RGB(inputBmp, YOLO_IN)
+
+        val shp = t.getOutputTensor(0).shape() // [1,5,8400] or [1,8400,5]
+        val cFirst = (shp[1] == 5)
+        val C = if (cFirst) shp[1] else shp[2]
+        val N = if (cFirst) shp[2] else shp[1]
+        if (!(C == 5 && N == 8400)) {
+            Log.e("SEATBELT", "Unexpected out shape: ${shp.joinToString()}")
+            return emptyList()
+        }
+
+        val boxes = ArrayList<RectF>()
+        val scores = ArrayList<Float>()
+
+        if (cFirst) {
+            val out = Array(1) { Array(5) { FloatArray(N) } }   // [1,5,8400]
+            t.run(input, out)
+            for (i in 0 until N) {
+                val x = out[0][0][i]; val y = out[0][1][i]
+                val w = out[0][2][i]; val h = out[0][3][i]
+                val obj = out[0][4][i]
+                addDetWithConf(src, x, y, w, h, obj, scale, padX, padY, boxes, scores, YOLO_IN, SB_CONF)
+            }
+        } else {
+            val out = Array(1) { Array(N) { FloatArray(5) } }   // [1,8400,5]
+            t.run(input, out)
+            for (i in 0 until N) {
+                val v = out[0][i]
+                val x = v[0]; val y = v[1]; val w = v[2]; val h = v[3]
+                val obj = v[4]
+                addDetWithConf(src, x, y, w, h, obj, scale, padX, padY, boxes, scores, YOLO_IN, SB_CONF)
+            }
+        }
+
+        if (boxes.isEmpty()) return emptyList()
+        val keep = nms(boxes, scores.toFloatArray(), SB_IOU, SB_TOPK)
+
+        // ✅ 한 줄 로그: 임계값 통과한 것들 중 최대 obj와 keep 수
+        Log.d("SEATBELT_CONF", "max=${"%.3f".format(scores.maxOrNull() ?: 0f)} kept=${keep.size}")
+
+        return keep.map { boxes[it] }
+    }
+
+    // Seatbelt용: 임계값 파라미터 있는 좌표 변환
+    private fun addDetWithConf(
+        src: Bitmap,
+        x: Float, y: Float, w: Float, h: Float, obj: Float,
+        scale: Float, padX: Float, padY: Float,
+        boxes: MutableList<RectF>, scores: MutableList<Float>,
+        inSize: Int, confTh: Float
+    ) {
+        if (obj < confTh) return
+        val cxL = x * inSize; val cyL = y * inSize
+        val wL  = w * inSize; val hL  = h * inSize
+        val cx = (cxL - padX) / scale; val cy = (cyL - padY) / scale
+        val ww =  wL / scale;         val hh =  hL / scale
+        val x1 = max(0f, cx - ww / 2f); val y1 = max(0f, cy - hh / 2f)
+        val x2 = min(src.width.toFloat(),  cx + ww / 2f)
+        val y2 = min(src.height.toFloat(), cy + hh / 2f)
+        if (x2 > x1 && y2 > y1) { boxes.add(RectF(x1, y1, x2, y2)); scores.add(obj) }
+    }
+
+    // -----------------------------------------------------
+    // 🔹 졸음 분류(간단): DB+DD ≥ 0.6, 연속 10프레임
     // -----------------------------------------------------
     private fun classifyDrowsy(faceBmp: Bitmap): Float {
         val t = interpreters[ModelType.DROWSINESS] ?: return 0f
-        // 224 RGB/255
         val input = toNHWC_RGB(faceBmp, CLF_IN)
         val out = Array(1) { FloatArray(4) }
         t.run(input, out)
@@ -238,16 +318,22 @@ object ModelHandler {
     // -----------------------------------------------------
     // 🔹 실제 분석 (CameraX)
     //   - 회전 보정 포함 (중요!)
-// -----------------------------------------------------
+    // -----------------------------------------------------
     fun analyzeImage(imageProxy: ImageProxy, callback: (List<String>) -> Unit) {
         val raw = imageProxy.toBitmap()
         val rotation = imageProxy.imageInfo.rotationDegrees
         val frame = raw.rotate(rotation)
 
-        // 기존 3종
+        // 담배/폰은 기존 파서 사용
         val cigaretteResults = runModel(frame, ModelType.CIGARETTE)
         val phoneResults     = runModel(frame, ModelType.PHONE)
-        val seatbeltResults  = runModel(frame, ModelType.SEATBELT)
+
+        // 새 안전벨트: 1×5×8400 → obj/NMS 후 박스 존재 여부로 판단(=벨트 존재)
+        val seatbeltBoxes = detectSeatbeltBoxes(frame)
+        val seatbeltDetected = seatbeltBoxes.isNotEmpty()
+        // 연속 미탐지 → 경고
+        if (seatbeltDetected) seatbeltMissStreak = 0 else seatbeltMissStreak += 1
+        val seatbeltAlert = seatbeltMissStreak >= SEATBELT_MIN_MISS_FRAMES
 
         // 얼굴 + 졸음
         val faces = detectFaces(frame)
@@ -264,17 +350,17 @@ object ModelHandler {
         }
 
         val events = mutableListOf<String>()
-        if (cigaretteResults.any { it.label.equals("cigarette", true) })          events.add("cigarette")
-        if (phoneResults.any     { it.label.equals("phone", true) })              events.add("phone")
-        if (seatbeltResults.any  { it.label.equals("person-noseatbelt", true) })  events.add("noseatbelt")
-        if (drowsyState == "DROWSINESS") events.add("DROWSINESS")
+        if (cigaretteResults.any { it.label.equals("cigarette", true) }) events.add("cigarette")
+        if (phoneResults.any     { it.label.equals("phone", true) })     events.add("phone")
+        if (seatbeltAlert)                                            events.add("noseatbelt")
+        if (drowsyState == "DROWSINESS")                               events.add("DROWSINESS")
 
         callback(events)
         imageProxy.close()
     }
 
     // -----------------------------------------------------
-    // 🔹 유틸 (간단 버전)
+    // 🔹 유틸
     // -----------------------------------------------------
     private fun crop(src: Bitmap, r: RectF): Bitmap {
         val l = r.left.toInt().coerceAtLeast(0)
