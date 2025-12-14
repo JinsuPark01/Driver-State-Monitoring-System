@@ -66,6 +66,13 @@ object WebSocketManager {
             okHttpClient
         )
 
+//        stompClient = Stomp.over(
+//            Stomp.ConnectionProvider.OKHTTP,
+//            "ws://ec2-43-201-195-11.ap-northeast-2.compute.amazonaws.com/ws-native",
+//            null,
+//            okHttpClient
+//        )
+
         // ✅ STOMP CONNECT frame header
         val headers = listOf(StompHeader("Authorization", "Bearer $token"))
 

@@ -51,14 +51,14 @@ object ModelHandler {
 
     // --- Drowsiness 정책 ---
     private const val DROWSY_TH = 0.9f
-    private const val DROWSY_MIN_FRAMES = 3
+    private const val DROWSY_MIN_FRAMES = 2
     private val drowsyWindow: Queue<Int> = LinkedList()
 
     // --- Seatbelt(새 모델) 정책 ---
     private const val SB_CONF = 0.35f     // obj 임계값
     private const val SB_IOU  = 0.45f
     private const val SB_TOPK = 100
-    private const val SEATBELT_MIN_MISS_FRAMES = 7  // 연속 미탐지 10프레임 → 경고
+    private const val SEATBELT_MIN_MISS_FRAMES = 7 // 연속 미탐지 10프레임 → 경고
     private var seatbeltMissStreak = 0
 
     // -----------------------------------------------------
@@ -68,14 +68,14 @@ object ModelHandler {
         if (initialized) return
         try {
             // 기존 3종 그대로 (담배/폰은 기존 파서 사용)
-            loadModel(context, ModelType.CIGARETTE, "cigarette_best_float16.tflite", "cigarette_best_labels.txt")
-            loadModel(context, ModelType.PHONE,     "phone_float16.tflite",         "phone_labels.txt")
+            //loadModel(context, ModelType.CIGARETTE, "cigarette_best_float16.tflite", "cigarette_best_labels.txt")
+            //loadModel(context, ModelType.PHONE,     "phone_float16.tflite",         "phone_labels.txt")
             // ⚠️ seatbelt는 새 YOLO(1×5×8400) 모델 -> label 파일 없음
             loadModel(context, ModelType.SEATBELT,  "seatbelt_best_float16.tflite", null)
 
             // 얼굴 + 졸음
-            loadModel(context, ModelType.FACE,       "yolov8n-face_float32.tflite", null)
-            loadModel(context, ModelType.DROWSINESS, "mobilenetv2_drowsiness_optimized.tflite", null)
+            //loadModel(context, ModelType.FACE,       "yolov8n-face_float32.tflite", null)
+            //loadModel(context, ModelType.DROWSINESS, "mobilenetv2_drowsiness_optimized.tflite", null)
 
             initialized = true
             Log.d("ModelHandler", "✅ All models initialized")
@@ -261,7 +261,7 @@ object ModelHandler {
         val keep = nms(boxes, scores.toFloatArray(), SB_IOU, SB_TOPK)
 
         // ✅ 한 줄 로그: 임계값 통과한 것들 중 최대 obj와 keep 수
-        Log.d("SEATBELT_CONF", "max=${"%.3f".format(scores.maxOrNull() ?: 0f)} kept=${keep.size}")
+       // Log.d("SEATBELT_CONF", "max=${"%.3f".format(scores.maxOrNull() ?: 0f)} kept=${keep.size}")
 
         return keep.map { boxes[it] }
     }

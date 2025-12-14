@@ -429,7 +429,7 @@ class WeeklyDispatchView(context: android.content.Context, attrs: AttributeSet?)
 
         paint.color = Color.parseColor("#F5F5F5")
         paint.style = Paint.Style.FILL
-        canvas.drawRect(left, headerHeight, right, headerHeight + (endHour - startHour) * hourHeight -resources.displayMetrics.density, paint)
+        canvas.drawRect(left, headerHeight, right-resources.displayMetrics.density, headerHeight + (endHour - startHour) * hourHeight -resources.displayMetrics.density, paint)
     }
 
     // ----------------- 높이 측정 (ScrollView용) -----------------

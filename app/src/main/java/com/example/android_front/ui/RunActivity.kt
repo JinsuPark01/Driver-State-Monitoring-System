@@ -417,10 +417,10 @@ class RunActivity : AppCompatActivity() {
                 if (deltaT > 0) {
                     val rate = deltaV / deltaT
                     when {
-                        rate >= 15.0 -> {
+                        rate >= 20.0 -> {
                             sendWarning(WarningType.ACCELERATION)
                         }
-                        rate <= -15.0 -> {
+                        rate <= -20.0 -> {
                             sendWarning(WarningType.BRAKING)
                         }
                     }
