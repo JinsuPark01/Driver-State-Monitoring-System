@@ -4,8 +4,17 @@
 운행 데이터와 함께 서버로 전송하여 관리자 웹에서 모니터링할 수 있도록
 구현한 Android 기반 운전자 상태 모니터링 시스템입니다.
 
-📷 App Screenshots
+---
 
+## 📷 App Screenshots
+
+| 로그인 | 회원가입 | 메인 | 마이 |
+|---|---|---|---|
+| ![](images/login.jpg) | ![](images/signup.jpg) | ![](images/main.jpg) | ![](images/mypage.jpg) |
+| 졸음 | 담배 | 휴대폰 | 미벨트 |
+| ![](images/drowsy.jpg) | ![](images/smoking.jpg) | ![](images/phone.jpg) | ![](images/seatbelt.jpg) |
+| 알람 | 결과 | 통계 | 날씨 |
+| ![](images/alarm.jpg) | ![](images/result.jpg) | ![](images/stat.jpg) | ![](images/weather.jpg) |
 
 ---
 
@@ -29,45 +38,62 @@ Android 앱은 CameraX 기반 영상 스트림을 분석하여
 
 ## 🏗 System Architecture
 
----
+```mermaid
+flowchart LR
+
+subgraph AI_Pipeline
+A[CameraX Video Stream] --> B[TensorFlow Lite Inference]
+B --> C[Event Detection]
+C --> D[WebSocket (STOMP)]
+end
+
+subgraph Vehicle_Data_Pipeline
+E[Unity OBD Simulator] --> F[TCP Socket]
+F --> G[Android App]
+G --> H[StateFlow]
+H --> I[UI Update]
+H --> D
+end
+
+D --> J[Spring Boot Server]
+J --> K[Admin Web Monitoring]
+```
 
 ## 🛠 Tech Stack
 
-### Mobile
+### 📱 Mobile
+Kotlin · Android · CameraX · Coroutines · RxJava2
 
-- Kotlin
-- Android
-- CameraX
-- Coroutines
-- RxJava2
+### 🤖 AI
+TensorFlow Lite · YOLOv8 · YOLOv8-Face · MobileNetV2
 
-### AI
+### 🌐 Network
+Retrofit2 · OkHttp · WebSocket(STOMP) · JWT
 
-- TensorFlow Lite
-- YOLOv8
-- YOLOv8-Face
-- MobileNetV2
+### 📊 Data Visualization
+Kakao Maps SDK · MPAndroidChart
 
-### Network
-
-- Retrofit2
-- OkHttp
-- WebSocket (STOMP)
-- JWT Authentication
-
-### Data Visualization
-
-- Kakao Maps SDK
-- MPAndroidChart
-
-### Backend / DevOps
-
-- Spring Boot
-- Docker
-- Kubernetes
+### 🖥 Backend / DevOps
+Spring Boot · Docker · Kubernetes
 
 ---
-
+## 📂 Project Structure(수정필요)
+```
+app
+├ ai
+│   ├ model
+│   └ inference
+├ network
+│   ├ retrofit
+│   └ websocket
+├ socket
+│   └ tcp
+├ ui
+│   ├ activity
+│   └ viewmodel
+└ util
+```
+---
 ## ⚙️ Key Features
 
 ### 🚘 AI 기반 운전자 상태 감지
@@ -100,13 +126,17 @@ Android 앱은 CameraX 기반 영상 스트림을 분석하여
 ## 💡 Implementation Highlights
 
 ### 1️⃣ 실시간 데이터 스트리밍 구조 설계
-
+```
 Unity OBD Simulator
-→ TCP Socket
-→ StateFlow
-→ UI 업데이트
-→ WebSocket Server 전송
-
+↓
+TCP Socket
+↓
+StateFlow
+↓
+UI Update
+↓
+WebSocket Server
+```
 실시간 차량 데이터를 **StateFlow 기반으로 관리하여
 UI 업데이트와 서버 전송을 분리한 스트리밍 구조**를 설계했습니다.
 
@@ -139,6 +169,16 @@ ModelHandler 싱글톤을 설계하여
 - 졸음: **2프레임 연속 감지**
 
 정책을 적용하여 **AI 감지 안정성을 개선**했습니다.
+
+### 5️⃣ Android App Architecture
+
+앱 내부 구조를 **Service / Manager / UI Layer**로 분리하여  
+각 기능의 책임을 명확하게 설계했습니다.
+
+- SocketService → OBD 데이터 수신
+- WebSocketManager → 서버 실시간 통신 관리
+- ModelHandler → AI 모델 관리
+- Activity / ViewModel → UI 상태 관리
 
 ---
 
