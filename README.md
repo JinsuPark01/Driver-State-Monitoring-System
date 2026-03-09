@@ -1,78 +1,235 @@
-# <프로젝트명> - Driver App (Android) 🚍📱
-AI 기반 차량 관제 시스템의 **운전자용 Android 앱**입니다.  
-운전자는 배차 일정 확인, 운행 시작/종료, 실시간 주행 데이터 확인, AI 기반 운전자 이상상태 감지(졸음/휴대폰/흡연/안전벨트 등), 경고 및 리포트 기능을 사용할 수 있습니다.
+# 🚗 Driver State Monitoring System
+
+실시간 카메라 기반 AI 분석을 통해 운전자의 위험 행동을 감지하고,
+운행 데이터와 함께 서버로 전송하여 관리자 웹에서 모니터링할 수 있도록
+구현한 Android 기반 운전자 상태 모니터링 시스템입니다.
+
+📷 App Screenshots
+
 
 ---
 
-## 1) 데모 / 스크린샷
-> 여기에 캡처 넣으면 완성도 급상승
+## 📌 Overview
 
-- 로그인 / 회원가입
-- 메인(배차 요약)
-- 운행 화면(실시간 데이터 + 경고 오버레이)
-- 리포트/점수 화면
+본 프로젝트는 **AI 기반 영상 분석과 실시간 운행 데이터를 결합하여
+운전자 위험 행동을 감지하는 시스템**입니다.
 
-예시:
-![main](images/main.png)
+Android 앱은 CameraX 기반 영상 스트림을 분석하여
+다음과 같은 위험 행동을 탐지합니다.
 
----
+- 졸음 운전
+- 흡연
+- 휴대폰 사용
+- 안전벨트 미착용
 
-## 2) 핵심 기능
-
-### ✅ 인증/계정
-- JWT 기반 로그인/회원가입
-- 토큰 저장 및 자동 로그인(만료 시 재로그인/갱신 정책)
-
-### ✅ 배차/운행
-- 배차 일정 조회(일/주 단위)
-- 배차 상세(노선/차량/시간) 확인
-- 운행 상태 전환: `SCHEDULED → RUNNING → COMPLETED` (지연/취소 등 포함)
-
-### ✅ 실시간 주행 데이터 수신
-- 시뮬레이터/서버로부터 주행 텔레메트리 수신(속도/가속 등)
-- 급가속/급제동 등 이벤트 감지 및 표시
-
-### ✅ AI 운전자 모니터링
-- CameraX 기반 실시간 분석
-- TFLite/YOLO 기반 감지: <졸음/휴대폰/흡연/안전벨트 ...>
-- 이상 감지 시 오버레이 경고 + 서버 전송(경고 로그)
-
-### ✅ 리포트/점수
-- 위험행동 카운트/점수화(예: 급가속/급제동/이상상태)
-- 운행 기록 조회(일/주/전체)
+탐지된 이벤트와 차량 운행 데이터는 서버로 전송되며,
+관리자는 웹 대시보드에서 운전자 상태와 운행 정보를 실시간으로 확인할 수 있습니다.
 
 ---
 
-## 3) 시스템 구성(Architecture)
-- Driver App (Android/Kotlin)
-- Backend (Spring Boot): REST API + WebSocket(STOMP)
-- DB (MySQL)
-- Admin Web (React)
-- Simulator (Unity): 주행 데이터 스트리밍
+## 🏗 System Architecture
 
-> 앱은 **REST(조회/저장)** + **WebSocket(실시간)**를 병행합니다.
 
-(선택) 아키텍처 그림 넣기:
-![architecture](images/architecture.png)
+```mermaid
+flowchart LR
+
+subgraph AI Pipeline
+A[CameraX Video Stream] --> B[TensorFlow Lite Inference]
+B --> C[Event Detection]
+C --> D[WebSocket (STOMP)]
+end
+
+subgraph Vehicle Data Pipeline
+E[Unity OBD Simulator] --> F[TCP Socket]
+F --> G[Android App]
+G --> H[StateFlow]
+H --> I[UI Update]
+H --> D
+end
+
+D --> J[Spring Boot Server]
+J --> K[Admin Web Monitoring]
 
 ---
 
-## 4) 기술 스택
-- **Android**: Kotlin, Android Studio, (Jetpack: ViewModel/LiveData 등)
-- **Network**: Retrofit2, OkHttp, WebSocket(STOMP)
-- **AI**: TensorFlow Lite, CameraX
-- **Chart/UI**: <MPAndroidChart 등 사용하면 추가>
-- **Build**: Gradle
+## 🛠 Tech Stack
+
+### Mobile
+
+- Kotlin
+- Android
+- CameraX
+- Coroutines
+- RxJava2
+
+### AI
+
+- TensorFlow Lite
+- YOLOv8
+- YOLOv8-Face
+- MobileNetV2
+
+### Network
+
+- Retrofit2
+- OkHttp
+- WebSocket (STOMP)
+- JWT Authentication
+
+### Data Visualization
+
+- Kakao Maps SDK
+- MPAndroidChart
+
+### Backend / DevOps
+
+- Spring Boot
+- Docker
+- Kubernetes
 
 ---
 
-## 5) 프로젝트 구조(예시)
-```text
-app/
- ├─ data/             # DTO, Repository
- ├─ network/          # Retrofit, Interceptor(JWT)
- ├─ websocket/        # STOMP client, subscribe
- ├─ socket/           # Simulator SocketService (port <9999>)
- ├─ ai/               # ModelHandler, preprocess, inference
- ├─ ui/               # Activity/Fragment/Adapter
- └─ utils/            # TokenManager, constants
+## ⚙️ Key Features
+
+### 🚘 AI 기반 운전자 상태 감지
+
+- 졸음 운전 감지
+- 흡연 감지
+- 휴대폰 사용 감지
+- 안전벨트 미착용 감지
+
+### 📡 실시간 운행 데이터 스트리밍
+
+- OBD 시뮬레이터 기반 차량 데이터 수신
+- 속도 / RPM / 배터리 / 브레이크 등 운행 정보 표시
+- WebSocket 기반 서버 실시간 전송
+
+### 📊 운행 데이터 분석
+
+- 운행 점수 계산
+- 그래프 기반 운행 통계 시각화
+- 위험 행동 발생 위치 지도 표시
+
+### 📅 배차 및 운행 관리
+
+- 배차 일정 조회
+- 배차 알림 수신
+- 달력 기반 운행 스케줄 관리
+
+---
+
+## 💡 Implementation Highlights
+
+### 1️⃣ 실시간 데이터 스트리밍 구조 설계
+
+Unity OBD Simulator
+→ TCP Socket
+→ StateFlow
+→ UI 업데이트
+→ WebSocket Server 전송
+
+실시간 차량 데이터를 **StateFlow 기반으로 관리하여
+UI 업데이트와 서버 전송을 분리한 스트리밍 구조**를 설계했습니다.
+
+---
+
+### 2️⃣ CameraX 기반 실시간 AI 추론 파이프라인
+
+- CameraX 프레임 수신
+- YUV → RGB 변환
+- TensorFlow Lite 추론
+- 이벤트 생성
+
+프레임 단위 비동기 처리 구조를 통해  
+**UI 스레드와 AI 추론을 분리하여 ANR을 방지**했습니다.
+
+---
+
+### 3️⃣ 다중 AI 모델 통합 관리
+
+ModelHandler 싱글톤을 설계하여
+
+- YOLOv8 객체 탐지
+- YOLOv8-face 얼굴 탐지
+- MobileNetV2 졸음 분류
+
+모델을 **앱 실행 시 1회 로딩 후 재사용하도록 구성하여
+메모리 사용량을 최소화**했습니다.
+
+---
+
+### 4️⃣ 연속 프레임 기반 오탐 방지 정책
+
+단일 프레임 detection 대신
+
+- 안전벨트: **7프레임 연속 미착용**
+- 졸음: **2프레임 연속 감지**
+
+정책을 적용하여 **AI 감지 안정성을 개선**했습니다.
+
+---
+
+## 🔧 Troubleshooting
+
+### 1️⃣ AI 추론 안정화 문제
+
+문제
+
+- 모델 입력 포맷 차이
+- 반복 모델 로딩
+- 단일 프레임 기반 오탐
+- 프레임 드롭 발생
+
+해결
+
+- ModelHandler 싱글톤 구조 설계
+- YUV → RGB 변환 최적화
+- Threshold 튜닝
+- 연속 프레임 기반 이벤트 정책 도입
+
+결과
+
+- 오탐률 감소
+- 이벤트 신뢰도 향상
+- 프레임 처리 안정성 확보
+
+---
+
+### 2️⃣ 실시간 통신 안정성 문제
+
+문제
+
+- WebSocket 연결 끊김
+- 이벤트 유실 가능성
+
+해결
+
+- REST / WebSocket 통신 분리
+- WebSocket 자동 재연결 정책 구현
+- StateFlow 기반 연결 상태 관리
+
+결과
+
+- 연결 복구 자동화
+- 실시간 이벤트 안정성 확보
+
+---
+
+### 3️⃣ 확장 가능한 배포 구조 설계
+
+문제
+
+- 단일 서버 구조의 확장성 한계
+
+해결
+
+- Docker 기반 컨테이너화
+- Kubernetes 환경 배포 테스트
+- Rolling Update 전략 적용
+
+결과
+
+- 확장 가능한 서버 구조 이해
+- 컨테이너 기반 배포 환경 경험
+
+---
