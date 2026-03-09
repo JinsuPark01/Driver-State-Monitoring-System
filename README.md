@@ -37,7 +37,7 @@ Android 앱은 CameraX 기반 영상 스트림을 분석하여
 ---
 
 ## 🏗 System Architecture
-
+```mermaid
 flowchart LR
 
 subgraph AI_Pipeline
@@ -56,7 +56,7 @@ end
 
 D --> J[Spring Boot Server]
 J --> K[Admin Web Monitoring]
-
+```
 ## 🛠 Tech Stack
 
 ### 📱 Mobile
