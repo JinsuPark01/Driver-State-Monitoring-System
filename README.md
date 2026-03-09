@@ -29,27 +29,6 @@ Android 앱은 CameraX 기반 영상 스트림을 분석하여
 
 ## 🏗 System Architecture
 
-
-```mermaid
-flowchart LR
-
-subgraph AI Pipeline
-A[CameraX Video Stream] --> B[TensorFlow Lite Inference]
-B --> C[Event Detection]
-C --> D[WebSocket (STOMP)]
-end
-
-subgraph Vehicle Data Pipeline
-E[Unity OBD Simulator] --> F[TCP Socket]
-F --> G[Android App]
-G --> H[StateFlow]
-H --> I[UI Update]
-H --> D
-end
-
-D --> J[Spring Boot Server]
-J --> K[Admin Web Monitoring]
-
 ---
 
 ## 🛠 Tech Stack
