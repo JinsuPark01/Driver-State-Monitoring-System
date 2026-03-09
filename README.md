@@ -38,13 +38,12 @@ Android 앱은 CameraX 기반 영상 스트림을 분석하여
 
 ## 🏗 System Architecture
 
-```mermaid
 flowchart LR
 
 subgraph AI_Pipeline
 A[CameraX Video Stream] --> B[TensorFlow Lite Inference]
 B --> C[Event Detection]
-C --> D[WebSocket (STOMP)]
+C --> D[WebSocket STOMP]
 end
 
 subgraph Vehicle_Data_Pipeline
@@ -57,7 +56,6 @@ end
 
 D --> J[Spring Boot Server]
 J --> K[Admin Web Monitoring]
-```
 
 ## 🛠 Tech Stack
 
