@@ -6,7 +6,10 @@
 
 ---
 
-## 📷 App Screenshots/ 🎥 Demo
+## 🎥 Demo / 📷 App Screenshots
+
+🎥 **Demo Video**
+https://github.com/user-attachments/assets/a46e6d63-d22b-4fec-82d7-91e211ee34b1
 
 | 로그인 | 회원가입 | 메인 | 마이 |
 |:---:|:---:|:---:|:---:|
@@ -15,9 +18,6 @@
 | ![](images/drowsy.jpg) | ![](images/smoking.jpg) | ![](images/phone.jpg) | ![](images/seatbelt.jpg) |
 | 알람 | 결과 | 통계 | 날씨 |
 | ![](images/alarm.jpg) | ![](images/result.jpg) | ![](images/stat.jpg) | ![](images/weather.jpg) |
-
-🎥 **Demo Video**
-https://github.com/user-attachments/assets/a46e6d63-d22b-4fec-82d7-91e211ee34b1
 
 ---
 
