@@ -75,22 +75,64 @@ Kakao Maps SDK · MPAndroidChart
 Spring Boot · Docker · Kubernetes
 
 ---
-## 📂 Project Structure(수정필요)
+## 📂 Project Structure
+
+### 간략 구조
 ```
-app
-├ ai
-│   ├ model
-│   └ inference
-├ network
-│   ├ retrofit
-│   └ websocket
-├ socket
-│   └ tcp
-├ ui
-│   ├ activity
-│   └ viewmodel
-└ util
+androidfront/
+└─ app/src/main/java/com/example/android_front/
+   ├─ MyApplication.kt
+   ├─ ai/             # 모델 핸들링 관련
+   ├─ api/            # Retrofit 기반 API 정의 및 토큰 관리
+   ├─ model/          # API Request/Response, Enum, Payload 모델
+   ├─ adapter/        # RecyclerView/Adapter
+   ├─ ui/             # 화면(Activity) 구성
+   ├─ service/        # Foreground 서비스
+   └─ websocket/      # WebSocket 통신 및 상태 관리
 ```
+<details>
+  <summary>상세 구조</summary>
+  <pre><code>
+androidfront/
+└─ app/src/main/java/com/example/android_front/
+   ├─ MyApplication.kt
+   ├─ ai/
+   │  └─ ModelHandler.kt
+   ├─ api/
+   │  ├─ AuthApi.kt
+   │  ├─ DispatchApi.kt
+   │  ├─ NotificationApi.kt
+   │  ├─ RetrofitInstance.kt
+   │  ├─ TokenManager.kt
+   │  ├─ UserApi.kt
+   │  └─ WarningApi.kt
+   ├─ model/
+   │  └─ (API request/response, enum, payload models)
+   ├─ adapter/
+   │  ├─ BannerAdapter.kt
+   │  ├─ DispatchEventAdapter.kt
+   │  ├─ DispatchPagerAdapter.kt
+   │  └─ NotificationAdapter.kt
+   ├─ ui/
+   │  ├─ LoginActivity.kt
+   │  ├─ SignUpActivity.kt
+   │  ├─ MainActivity.kt
+   │  ├─ MyPageActivity.kt
+   │  ├─ RunActivity.kt
+   │  ├─ RecordActivity.kt
+   │  ├─ AllScoreActivity.kt
+   │  ├─ ScheduleActivity.kt
+   │  ├─ WeatherActivity.kt
+   │  ├─ MonitorActivity.kt
+   │  └─ SettingActivity.kt
+   ├─ service/
+   │  └─ SocketService.kt
+   └─ websocket/
+      ├─ WebSocketManager.kt
+      └─ NotificationState.kt
+  </code></pre>
+</details>
+  
 ---
 ## ⚙️ Key Features
 
