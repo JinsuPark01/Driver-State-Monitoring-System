@@ -9,7 +9,8 @@
 ## 🎥 Demo / 📷 App Screenshots
 
 🎥 **Demo Video**
-https://github.com/user-attachments/assets/a46e6d63-d22b-4fec-82d7-91e211ee34b1
+
+https://github.com/user-attachments/assets/a46e6d63-d22b-4fec-82d7-91e211ee34b1 (2분 이전까지)
 
 | 로그인 | 회원가입 | 메인 | 마이 |
 |:---:|:---:|:---:|:---:|
