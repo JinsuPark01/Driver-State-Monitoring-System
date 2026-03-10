@@ -11,7 +11,7 @@
 | 로그인 | 회원가입 | 메인 | 마이 |
 |---|---|---|---|
 | ![](images/login.jpg) | ![](images/signup.jpg) | ![](images/main.jpg) | ![](images/mypage.jpg) |
-| 졸음 | 담배 | 휴대폰 | 미벨트 |
+| 졸음 감지 | 담배 감지 | 휴대폰 감지 | 미벨트 감지 |
 | ![](images/drowsy.jpg) | ![](images/smoking.jpg) | ![](images/phone.jpg) | ![](images/seatbelt.jpg) |
 | 알람 | 결과 | 통계 | 날씨 |
 | ![](images/alarm.jpg) | ![](images/result.jpg) | ![](images/stat.jpg) | ![](images/weather.jpg) |
