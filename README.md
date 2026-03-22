@@ -64,7 +64,7 @@ J --> K[Admin Web Monitoring]
 ## 🛠 Tech Stack
 
 ### 📱 Mobile
-Kotlin · Android · CameraX · Coroutines · RxJava2
+Kotlin · Android · MVVM(부분적) · Jetpack (LiveData, Lifecycle, CameraX, FusedLocationProvider) · Coroutines · Flow · RxJava2
 
 ### 🤖 AI
 TensorFlow Lite · YOLOv8 · YOLOv8-Face · MobileNetV2
