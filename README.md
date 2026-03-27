@@ -240,7 +240,7 @@ ModelHandler 싱글톤을 설계하여
 🛠 해결
 
 - ModelHandler 싱글톤 구조 설계
-- YUV → RGB 변환 최적화
+- 입력 전처리 흐름 정리
 - Threshold 튜닝
 - 연속 프레임 기반 이벤트 정책 도입
 
