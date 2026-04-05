@@ -44,22 +44,24 @@ Android 앱은 CameraX 기반 영상 스트림을 분석하여
 ```mermaid
 flowchart LR
 
-subgraph AI_Pipeline
-A[CameraX Video Stream] --> B[TensorFlow Lite Inference]
-B --> C[Event Detection]
-C --> D[WebSocket STOMP]
+subgraph AI_Pipeline[AI Inference Pipeline]
+A[CameraX ImageAnalysis] --> B[YUV to RGB]
+B --> C[TensorFlow Lite Inference]
+C --> D[Consecutive Frame / Threshold Filtering]
+D --> E[Risk Event Detection]
 end
 
-subgraph Vehicle_Data_Pipeline
-E[Unity OBD Simulator] --> F[TCP Socket]
-F --> G[Android App]
+subgraph Vehicle_Data_Pipeline[Vehicle Data Pipeline]
+F[Unity OBD Simulator] --> G[TCP Socket]
 G --> H[StateFlow]
 H --> I[UI Update]
-H --> D
+H --> J[Vehicle Data]
 end
 
-D --> J[Spring Boot Server]
-J --> K[Admin Web Monitoring]
+E --> K[WebSocket STOMP]
+J --> K
+K --> L[Spring Boot Server]
+L --> M[Admin Web Monitoring]
 ```
 ## 🛠 Tech Stack
 
